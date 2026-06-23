@@ -88,8 +88,16 @@ a {
   font-weight: 600;
 }
 
-.topnav a.active {
+.topnav a.active,
+.link-button {
   color: var(--text-primary);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
 }
 
 .streak-pill {
@@ -104,6 +112,22 @@ a {
   width: min(1120px, 100%);
   margin: 0 auto;
   padding: clamp(1rem, 4vw, 3rem);
+}
+
+.status-banner {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(108, 92, 231, 0.35);
+  border-radius: 1rem;
+  background: rgba(108, 92, 231, 0.12);
+  color: var(--text-secondary);
+}
+
+.status-error {
+  border-color: rgba(255, 118, 117, 0.35);
+  background: rgba(255, 118, 117, 0.1);
+  color: #ffb4b3;
 }
 
 .hero-page,
@@ -363,6 +387,35 @@ a {
   display: grid;
   gap: 0.75rem;
   margin: 1.5rem 0;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.auth-form input {
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  outline: none;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.auth-actions {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 .inline-answer {

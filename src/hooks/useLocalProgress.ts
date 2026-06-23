@@ -27,5 +27,10 @@ export function useLocalProgress() {
     setProgressState((current) => setCurrentStep(current, lessonId, stepIndex));
   }, []);
 
-  return { progress, completeStep, goToStep };
+  const replaceProgress = useCallback((nextProgress: AppProgress) => {
+    setProgressState(nextProgress);
+    saveProgress(nextProgress);
+  }, []);
+
+  return { progress, completeStep, goToStep, replaceProgress };
 }
