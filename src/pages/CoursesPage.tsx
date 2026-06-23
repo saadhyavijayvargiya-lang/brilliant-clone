@@ -54,7 +54,10 @@ export function CoursesPage({ progress }: CoursesPageProps) {
                     key={course.id}
                     to={`/course/${course.id}`}
                   >
-                    <div className="course-orb" />
+                    <div className="course-orb">
+                      <span className="course-orb-ring" />
+                      <span className="course-orb-moon" />
+                    </div>
                     <div className="node-eyebrow">
                       {course.level} · {lessons.length} lessons
                     </div>

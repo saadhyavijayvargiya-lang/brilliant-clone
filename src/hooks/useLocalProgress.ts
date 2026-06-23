@@ -7,6 +7,7 @@ import {
   saveProgress,
   setCurrentStep,
   setDisplayName,
+  setProfileBackground,
 } from "../lib/localProgress";
 
 export function useLocalProgress() {
@@ -45,6 +46,10 @@ export function useLocalProgress() {
     []
   );
 
+  const updateProfileBackground = useCallback((profileBackground: string) => {
+    setProgressState((current) => setProfileBackground(current, profileBackground));
+  }, []);
+
   return {
     progress,
     completeStep,
@@ -52,5 +57,6 @@ export function useLocalProgress() {
     recordIncorrect,
     replaceProgress,
     updateDisplayName,
+    updateProfileBackground,
   };
 }

@@ -7,9 +7,37 @@ import { FormEvent, useEffect, useState } from "react";
 interface ProfilePageProps {
   progress: AppProgress;
   onDisplayNameChange: (displayName: string) => void;
+  onBackgroundChange: (background: string) => void;
 }
 
-export function ProfilePage({ progress, onDisplayNameChange }: ProfilePageProps) {
+const backgroundOptions = [
+  {
+    id: "nebula",
+    title: "Nebula",
+    description: "Soft violet clouds and star dust.",
+  },
+  {
+    id: "fractal",
+    title: "Fractal",
+    description: "Recursive arcs and electric gradients.",
+  },
+  {
+    id: "eclipse",
+    title: "Eclipse",
+    description: "Golden orbit rings against deep space.",
+  },
+  {
+    id: "aurora",
+    title: "Aurora",
+    description: "Cyan waves with a calm night-sky feel.",
+  },
+];
+
+export function ProfilePage({
+  progress,
+  onDisplayNameChange,
+  onBackgroundChange,
+}: ProfilePageProps) {
   const [draftName, setDraftName] = useState(progress.displayName);
 
   useEffect(() => {
@@ -44,7 +72,7 @@ export function ProfilePage({ progress, onDisplayNameChange }: ProfilePageProps)
 
   return (
     <main className="page profile-page">
-      <section className="panel profile-hero">
+      <section className={`panel profile-hero profile-bg-${progress.profileBackground ?? "nebula"}`}>
         <div className="profile-avatar-ring">
           <span>{progress.displayName[0] ?? "L"}</span>
         </div>
@@ -103,6 +131,30 @@ export function ProfilePage({ progress, onDisplayNameChange }: ProfilePageProps)
           {["🪐", "🌙", "☄", "✦", "∞"].map((avatar) => (
             <button className="sample-avatar" key={avatar}>
               {avatar}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="subject-heading">
+          <h2>Profile background</h2>
+          <span>choose your space</span>
+        </div>
+        <div className="background-grid">
+          {backgroundOptions.map((option) => (
+            <button
+              className={`background-option background-option-${option.id} ${
+                (progress.profileBackground ?? "nebula") === option.id
+                  ? "background-option-active"
+                  : ""
+              }`}
+              key={option.id}
+              onClick={() => onBackgroundChange(option.id)}
+            >
+              <span className="background-preview" />
+              <strong>{option.title}</strong>
+              <small>{option.description}</small>
             </button>
           ))}
         </div>

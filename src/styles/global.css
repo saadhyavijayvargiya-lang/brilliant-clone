@@ -416,6 +416,25 @@ a {
   box-shadow: 0 0 80px rgba(108, 92, 231, 0.35);
 }
 
+.course-orb-ring {
+  position: absolute;
+  inset: 1.9rem -1.3rem;
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.course-orb-moon {
+  position: absolute;
+  right: -0.55rem;
+  bottom: 0.4rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.3);
+}
+
 .course-card-cyan .course-orb {
   background:
     radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.78), transparent 16%),
@@ -553,6 +572,34 @@ a {
   color: white;
   font-size: 1.25rem;
   font-weight: 900;
+}
+
+.planet-ring {
+  position: absolute;
+  inset: 1.35rem -0.85rem;
+  display: none;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.planet-moon {
+  position: absolute;
+  display: none;
+  right: -0.45rem;
+  top: 0.3rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.38);
+}
+
+.planet-style-ring .planet-ring,
+.planet-style-double .planet-ring,
+.planet-style-moon .planet-moon,
+.planet-style-double .planet-moon {
+  display: block;
 }
 
 .planet-path-cyan .planet-marker {
@@ -1160,6 +1207,50 @@ a {
   grid-template-columns: auto 1fr;
   gap: 1.25rem;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-hero::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  opacity: 0.62;
+}
+
+.profile-bg-nebula::before,
+.background-option-nebula .background-preview {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(108, 92, 231, 0.55), transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(0, 206, 201, 0.32), transparent 24%),
+    radial-gradient(circle at 50% 85%, rgba(255, 118, 117, 0.22), transparent 30%);
+}
+
+.profile-bg-fractal::before,
+.background-option-fractal .background-preview {
+  background:
+    repeating-radial-gradient(circle at 28% 36%, rgba(0, 206, 201, 0.35) 0 2px, transparent 3px 14px),
+    conic-gradient(from 35deg, rgba(108, 92, 231, 0.55), transparent, rgba(0, 206, 201, 0.4), transparent);
+}
+
+.profile-bg-eclipse::before,
+.background-option-eclipse .background-preview {
+  background:
+    radial-gradient(circle at 72% 35%, rgba(15, 17, 23, 0.9) 0 16%, rgba(249, 217, 118, 0.45) 17% 22%, transparent 24%),
+    radial-gradient(circle at 25% 70%, rgba(249, 217, 118, 0.24), transparent 26%);
+}
+
+.profile-bg-aurora::before,
+.background-option-aurora .background-preview {
+  background:
+    linear-gradient(120deg, transparent 0 20%, rgba(0, 206, 201, 0.38) 28%, transparent 40%),
+    linear-gradient(60deg, transparent 0 32%, rgba(108, 92, 231, 0.42) 45%, transparent 58%),
+    radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.14), transparent 20%);
 }
 
 .profile-avatar-ring,
@@ -1204,6 +1295,39 @@ a {
   outline: none;
   background: var(--bg-elevated);
   color: var(--text-primary);
+}
+
+.background-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.background-option {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.background-option-active {
+  border-color: rgba(0, 206, 201, 0.62);
+  box-shadow: 0 0 24px rgba(0, 206, 201, 0.12);
+}
+
+.background-preview {
+  display: block;
+  min-height: 72px;
+  border-radius: 0.75rem;
+}
+
+.background-option small {
+  color: var(--text-secondary);
 }
 
 .avatar-row {
@@ -1352,6 +1476,7 @@ a {
   .course-grid,
   .achievement-grid,
   .leaderboard-grid,
+  .background-grid,
   .profile-hero,
   .profile-course-item,
   .state-diagram {

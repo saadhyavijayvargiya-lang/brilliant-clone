@@ -79,6 +79,7 @@ export interface LessonProgress {
 export interface AppProgress {
   displayName: string;
   hasCustomDisplayName: boolean;
+  profileBackground: string;
   streakCount: number;
   lastActiveDate: string | null;
   activeDates: string[];

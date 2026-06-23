@@ -22,6 +22,7 @@ export default function App() {
     recordIncorrect,
     replaceProgress,
     updateDisplayName,
+    updateProfileBackground,
   } =
     useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -88,6 +89,7 @@ export default function App() {
             <ProfilePage
               progress={progress}
               onDisplayNameChange={(name) => updateDisplayName(name, true)}
+              onBackgroundChange={updateProfileBackground}
             />
           }
         />

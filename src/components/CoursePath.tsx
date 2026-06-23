@@ -22,10 +22,14 @@ export function CoursePath({ course, lessons, progress }: CoursePathProps) {
         return (
           <li
             key={lesson.id}
-            className={`planet-node planet-node-${status} planet-node-${lesson.order % 2 === 0 ? "right" : "left"}`}
+            className={`planet-node planet-node-${status} planet-node-${lesson.order % 2 === 0 ? "right" : "left"} planet-style-${getPlanetStyle(lesson.order)}`}
           >
             <div className="orbit-line" />
-            <div className="planet-marker">{lesson.order}</div>
+            <div className="planet-marker">
+              {lesson.order}
+              <span className="planet-ring" />
+              <span className="planet-moon" />
+            </div>
             <div className="planet-card">
               <div className="node-eyebrow">
                 Lesson {lesson.order} · {lesson.estimatedMinutes} min
@@ -51,4 +55,11 @@ export function CoursePath({ course, lessons, progress }: CoursePathProps) {
       })}
     </ol>
   );
+}
+
+function getPlanetStyle(order: number): "plain" | "ring" | "moon" | "double" {
+  if (order % 5 === 0) return "double";
+  if (order % 3 === 0) return "moon";
+  if (order % 2 === 0) return "ring";
+  return "plain";
 }
