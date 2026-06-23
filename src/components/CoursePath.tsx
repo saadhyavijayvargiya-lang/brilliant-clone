@@ -35,6 +35,10 @@ export function CoursePath({ course, lessons, progress }: CoursePathProps) {
               <span className="planet-cap planet-cap-bottom" />
               <span className="planet-continent planet-continent-one" />
               <span className="planet-continent planet-continent-two" />
+              <span className="planet-cloud planet-cloud-one" />
+              <span className="planet-cloud planet-cloud-two" />
+              <span className="planet-crater planet-crater-one" />
+              <span className="planet-crater planet-crater-two" />
             </div>
             <div className="planet-card">
               <div className="node-eyebrow">
