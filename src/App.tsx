@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { CosmicBackground } from "./components/CosmicBackground";
 import { TopBar } from "./components/TopBar";
 import { useAuth } from "./hooks/useAuth";
 import { useLocalProgress } from "./hooks/useLocalProgress";
@@ -64,6 +65,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <CosmicBackground />
       <TopBar progress={progress} user={user} onSignOut={logOut} />
       {error ? <div className="status-banner status-error">{error}</div> : null}
       {syncMessage ? <div className="status-banner">{syncMessage}</div> : null}

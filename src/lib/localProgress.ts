@@ -12,6 +12,7 @@ export function defaultProgress(): AppProgress {
     activeDates: [],
     currentCorrectStreak: 0,
     longestCorrectStreak: 0,
+    experiencePoints: 0,
     lessonProgress: {},
     completedLessons: [],
   };
@@ -118,13 +119,18 @@ export function markStepComplete(
     ? current.completedStepIds
     : [...current.completedStepIds, stepId];
   const alreadyCompleted = current.completedStepIds.includes(stepId);
+  const alreadyLessonCompleted = Boolean(current.completedAt);
   const currentCorrectStreak = alreadyCompleted
     ? activeProgress.currentCorrectStreak
     : (activeProgress.currentCorrectStreak ?? 0) + 1;
   const lessonCompleted = completedStepIds.length >= totalSteps;
+  const xpEarned =
+    (alreadyCompleted ? 0 : 10) +
+    (lessonCompleted && !alreadyLessonCompleted ? 50 : 0);
 
   const nextProgress: AppProgress = {
     ...activeProgress,
+    experiencePoints: (activeProgress.experiencePoints ?? 0) + xpEarned,
     currentCorrectStreak,
     longestCorrectStreak: Math.max(
       activeProgress.longestCorrectStreak ?? 0,

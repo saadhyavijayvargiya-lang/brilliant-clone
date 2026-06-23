@@ -121,15 +121,22 @@ export function getLeaderboard(progress: AppProgress) {
       name: progress.displayName || "You",
       correctStreak: progress.longestCorrectStreak ?? 0,
       loginStreak: progress.streakCount ?? 0,
+      experiencePoints: progress.experiencePoints ?? 0,
       isCurrentUser: true,
     },
-    { name: "Nova", correctStreak: 18, loginStreak: 12 },
-    { name: "Kai", correctStreak: 14, loginStreak: 21 },
-    { name: "Mira", correctStreak: 11, loginStreak: 8 },
-    { name: "Sol", correctStreak: 9, loginStreak: 15 },
+    { name: "Nova", correctStreak: 18, loginStreak: 12, experiencePoints: 4280 },
+    { name: "Kai", correctStreak: 14, loginStreak: 21, experiencePoints: 5120 },
+    { name: "Mira", correctStreak: 11, loginStreak: 8, experiencePoints: 3190 },
+    { name: "Sol", correctStreak: 9, loginStreak: 15, experiencePoints: 2760 },
   ].sort((a, b) => b.correctStreak - a.correctStreak);
 }
 
 export function getLoginLeaderboard(progress: AppProgress) {
   return [...getLeaderboard(progress)].sort((a, b) => b.loginStreak - a.loginStreak);
+}
+
+export function getXpLeaderboard(progress: AppProgress) {
+  return [...getLeaderboard(progress)].sort(
+    (a, b) => b.experiencePoints - a.experiencePoints
+  );
 }

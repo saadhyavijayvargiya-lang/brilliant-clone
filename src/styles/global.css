@@ -42,7 +42,262 @@ a {
 }
 
 .app-shell {
+  position: relative;
   min-height: 100vh;
+  isolation: isolate;
+}
+
+.app-shell > :not(.cosmic-background) {
+  position: relative;
+  z-index: 1;
+}
+
+.cosmic-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(108, 92, 231, 0.18), transparent 26rem),
+    radial-gradient(circle at 78% 12%, rgba(0, 206, 201, 0.1), transparent 24rem),
+    linear-gradient(180deg, rgba(15, 17, 23, 0.1), rgba(15, 17, 23, 0.7));
+}
+
+.cosmic-background::before,
+.cosmic-background::after {
+  position: absolute;
+  inset: -20%;
+  content: "";
+  opacity: 0.4;
+  transform-origin: center;
+}
+
+.cosmic-background::before {
+  background:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.045) 0 1px, transparent 2px 18px),
+    conic-gradient(from 20deg, transparent, rgba(108, 92, 231, 0.12), transparent, rgba(0, 206, 201, 0.1), transparent);
+  animation: slowSpin 80s linear infinite;
+}
+
+.cosmic-background::after {
+  background:
+    radial-gradient(circle at 35% 62%, rgba(255, 118, 117, 0.1), transparent 16rem),
+    radial-gradient(circle at 70% 55%, rgba(249, 217, 118, 0.08), transparent 18rem);
+  animation: cosmicDrift 34s ease-in-out infinite alternate;
+}
+
+.star-layer,
+.galaxy,
+.supernova,
+.meteor {
+  position: absolute;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.75);
+  animation: twinkle 6s ease-in-out infinite;
+}
+
+.star-layer {
+  inset: 0;
+}
+
+.star-layer-far {
+  animation: starDriftFar 120s linear infinite;
+}
+
+.star-layer-near {
+  animation: starDriftNear 70s linear infinite;
+}
+
+.galaxy {
+  width: 34rem;
+  height: 34rem;
+  border-radius: 50%;
+  filter: blur(1px);
+  opacity: 0.22;
+  mix-blend-mode: screen;
+}
+
+.galaxy-one {
+  left: -7rem;
+  top: 18%;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.35), transparent 8%),
+    conic-gradient(from 40deg, transparent, rgba(108, 92, 231, 0.5), transparent, rgba(0, 206, 201, 0.35), transparent);
+  animation: galaxyFloatOne 44s ease-in-out infinite alternate;
+}
+
+.galaxy-two {
+  right: -10rem;
+  bottom: 8%;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.28), transparent 7%),
+    conic-gradient(from 120deg, transparent, rgba(249, 217, 118, 0.35), transparent, rgba(255, 118, 117, 0.32), transparent);
+  animation: galaxyFloatTwo 52s ease-in-out infinite alternate;
+}
+
+.supernova {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: white;
+  box-shadow:
+    0 0 18px rgba(255, 255, 255, 0.9),
+    0 0 54px rgba(0, 206, 201, 0.55),
+    0 0 96px rgba(108, 92, 231, 0.36);
+  opacity: 0;
+  animation: supernovaPulse 12s ease-in-out infinite;
+}
+
+.supernova-one {
+  left: 24%;
+  top: 28%;
+}
+
+.supernova-two {
+  right: 18%;
+  top: 64%;
+  animation-delay: -6s;
+}
+
+.meteor {
+  width: 10rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), rgba(0, 206, 201, 0.2));
+  opacity: 0;
+  transform: rotate(-28deg);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+  animation: meteorShower 9s linear infinite;
+}
+
+.meteor-one {
+  left: 78%;
+  top: 8%;
+}
+
+.meteor-two {
+  left: 58%;
+  top: 34%;
+  animation-delay: -3.2s;
+  animation-duration: 11s;
+}
+
+.meteor-three {
+  left: 88%;
+  top: 70%;
+  animation-delay: -6.7s;
+  animation-duration: 13s;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    transform: scale(0.78);
+    opacity: 0.28;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+}
+
+@keyframes starDriftFar {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-4rem, 3rem, 0);
+  }
+}
+
+@keyframes starDriftNear {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(5rem, -4rem, 0);
+  }
+}
+
+@keyframes slowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cosmicDrift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 2%, 0) scale(1.08);
+  }
+}
+
+@keyframes galaxyFloatOne {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
+  }
+  to {
+    transform: translate3d(8rem, -4rem, 0) rotate(24deg) scale(1.08);
+  }
+}
+
+@keyframes galaxyFloatTwo {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  to {
+    transform: translate3d(-6rem, 3rem, 0) rotate(-20deg) scale(1.1);
+  }
+}
+
+@keyframes supernovaPulse {
+  0%,
+  72%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  84% {
+    opacity: 0.42;
+    transform: scale(5.2);
+  }
+}
+
+@keyframes meteorShower {
+  0%,
+  68% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-28deg);
+  }
+  72% {
+    opacity: 1;
+  }
+  82%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-38rem, 20rem, 0) rotate(-28deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cosmic-background *,
+  .cosmic-background::before,
+  .cosmic-background::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 .topbar {
@@ -416,6 +671,10 @@ a {
   box-shadow: 0 0 80px rgba(108, 92, 231, 0.35);
 }
 
+.course-orb > span {
+  pointer-events: none;
+}
+
 .course-orb-ring {
   position: absolute;
   inset: 1.9rem -1.3rem;
@@ -435,6 +694,65 @@ a {
   box-shadow: 0 0 22px rgba(255, 255, 255, 0.3);
 }
 
+.course-orb-bands,
+.course-orb-spot,
+.course-orb-cap,
+.course-orb-continent {
+  position: absolute;
+  display: block;
+}
+
+.course-orb-bands {
+  inset: 0.75rem 0.25rem;
+  border-radius: 50%;
+  opacity: 0.72;
+}
+
+.course-orb-spot {
+  right: 1rem;
+  bottom: 1.55rem;
+  width: 1.35rem;
+  height: 0.82rem;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+.course-orb-cap {
+  right: 1rem;
+  left: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  opacity: 0.85;
+}
+
+.course-orb-cap-top {
+  top: 0.22rem;
+}
+
+.course-orb-cap-bottom {
+  bottom: 0.22rem;
+}
+
+.course-orb-continent {
+  border-radius: 55% 45% 62% 38%;
+  opacity: 0.85;
+}
+
+.course-orb-continent-one {
+  top: 1.45rem;
+  left: 1.25rem;
+  width: 1.6rem;
+  height: 1rem;
+}
+
+.course-orb-continent-two {
+  right: 1.35rem;
+  bottom: 1.15rem;
+  width: 1.25rem;
+  height: 1.4rem;
+  transform: rotate(24deg);
+}
+
 .course-card-cyan .course-orb {
   background:
     radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.78), transparent 16%),
@@ -442,11 +760,44 @@ a {
   box-shadow: 0 0 80px rgba(0, 206, 201, 0.28);
 }
 
+.course-card-cyan .course-orb-cap {
+  background: rgba(230, 255, 255, 0.72);
+}
+
+.course-card-cyan .course-orb-continent {
+  background: rgba(4, 95, 97, 0.6);
+}
+
+.course-card-cyan .course-orb-bands {
+  background:
+    linear-gradient(180deg, transparent 0 20%, rgba(255, 255, 255, 0.28) 22% 28%, transparent 30% 48%, rgba(0, 54, 70, 0.22) 50% 57%, transparent 60% 100%);
+}
+
 .course-card-gold .course-orb {
   background:
     radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.78), transparent 16%),
     linear-gradient(135deg, #f9d976, #c7792b);
   box-shadow: 0 0 80px rgba(249, 217, 118, 0.28);
+}
+
+.course-card-gold .course-orb-bands {
+  background:
+    repeating-linear-gradient(180deg, rgba(120, 54, 16, 0.26) 0 8px, rgba(255, 240, 170, 0.18) 8px 17px, transparent 17px 25px);
+  transform: rotate(-8deg);
+}
+
+.course-card-gold .course-orb-spot {
+  background: radial-gradient(circle at 35% 35%, #ffdf9a, #a84e2d 65%, transparent 70%);
+}
+
+.course-card-violet .course-orb-bands {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0 7px, rgba(44, 22, 114, 0.28) 7px 16px, transparent 16px 24px);
+  transform: rotate(10deg);
+}
+
+.course-card-violet .course-orb-spot {
+  background: radial-gradient(circle at 35% 35%, #ffb7a2, #b44868 65%, transparent 70%);
 }
 
 .course-card h3 {
@@ -572,6 +923,20 @@ a {
   color: white;
   font-size: 1.25rem;
   font-weight: 900;
+  overflow: visible;
+}
+
+.planet-marker::before {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  content: "";
+}
+
+.planet-label {
+  position: relative;
+  z-index: 2;
 }
 
 .planet-ring {
@@ -581,6 +946,7 @@ a {
   border: 2px solid rgba(255, 255, 255, 0.28);
   border-radius: 50%;
   transform: rotate(-18deg);
+  z-index: 3;
 }
 
 .planet-moon {
@@ -593,6 +959,65 @@ a {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 0 18px rgba(255, 255, 255, 0.38);
+  z-index: 4;
+}
+
+.planet-bands,
+.planet-spot,
+.planet-cap,
+.planet-continent {
+  position: absolute;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.planet-bands {
+  inset: 0.35rem 0.15rem;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.planet-spot {
+  right: 0.72rem;
+  bottom: 1.1rem;
+  width: 0.9rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+
+.planet-cap {
+  right: 0.65rem;
+  left: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+}
+
+.planet-cap-top {
+  top: 0.12rem;
+}
+
+.planet-cap-bottom {
+  bottom: 0.12rem;
+}
+
+.planet-continent {
+  border-radius: 55% 45% 62% 38%;
+}
+
+.planet-continent-one {
+  top: 0.95rem;
+  left: 0.72rem;
+  width: 1rem;
+  height: 0.65rem;
+}
+
+.planet-continent-two {
+  right: 0.8rem;
+  bottom: 0.8rem;
+  width: 0.8rem;
+  height: 0.95rem;
+  transform: rotate(22deg);
 }
 
 .planet-style-ring .planet-ring,
@@ -600,6 +1025,71 @@ a {
 .planet-style-moon .planet-moon,
 .planet-style-double .planet-moon {
   display: block;
+}
+
+.planet-style-double .planet-ring {
+  border-width: 3px;
+  border-top-color: rgba(255, 255, 255, 0.48);
+  transform: rotate(18deg);
+}
+
+.planet-texture-gas .planet-bands,
+.planet-texture-storm .planet-bands,
+.planet-texture-storm .planet-spot,
+.planet-texture-ice .planet-cap,
+.planet-texture-terra .planet-continent,
+.planet-texture-lava .planet-bands,
+.planet-texture-lava .planet-spot {
+  display: block;
+}
+
+.planet-texture-gas .planet-bands {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 248, 210, 0.2) 0 5px, rgba(93, 48, 158, 0.28) 5px 10px, rgba(0, 206, 201, 0.12) 10px 15px);
+  transform: rotate(-10deg);
+}
+
+.planet-texture-storm .planet-bands {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 238, 190, 0.26) 0 4px, rgba(143, 80, 46, 0.32) 4px 9px, rgba(65, 35, 120, 0.18) 9px 14px);
+  transform: rotate(7deg);
+}
+
+.planet-texture-storm .planet-spot {
+  background: radial-gradient(circle at 35% 35%, #ffd1ad, #b43d36 62%, rgba(255, 255, 255, 0.08) 70%);
+}
+
+.planet-texture-ice .planet-cap {
+  background: rgba(232, 255, 255, 0.76);
+  box-shadow: 0 0 10px rgba(232, 255, 255, 0.35);
+}
+
+.planet-texture-ice .planet-moon {
+  background: #c8f8ff;
+}
+
+.planet-texture-terra .planet-continent {
+  background: rgba(0, 206, 145, 0.52);
+  box-shadow: inset 0 0 8px rgba(9, 42, 32, 0.24);
+}
+
+.planet-texture-terra .planet-marker::before {
+  background: radial-gradient(circle at 30% 80%, rgba(0, 206, 201, 0.2), transparent 34%);
+}
+
+.planet-texture-lava .planet-bands {
+  background:
+    linear-gradient(120deg, transparent 0 20%, rgba(255, 118, 117, 0.55) 23% 27%, transparent 30% 100%),
+    linear-gradient(55deg, transparent 0 48%, rgba(249, 217, 118, 0.45) 50% 54%, transparent 58% 100%);
+}
+
+.planet-texture-lava .planet-spot {
+  background: radial-gradient(circle, #f9d976, #ff7675 55%, transparent 70%);
+  box-shadow: 0 0 16px rgba(255, 118, 117, 0.42);
+}
+
+.planet-texture-lava .planet-moon {
+  background: #ffb86b;
 }
 
 .planet-path-cyan .planet-marker {

@@ -85,6 +85,7 @@ export interface AppProgress {
   activeDates: string[];
   currentCorrectStreak: number;
   longestCorrectStreak: number;
+  experiencePoints: number;
   lessonProgress: Record<string, LessonProgress>;
   completedLessons: string[];
 }

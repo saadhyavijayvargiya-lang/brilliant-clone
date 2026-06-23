@@ -119,6 +119,10 @@ export function ProfilePage({
             <strong>{unlockedAchievements.length}</strong>
             <span>achievements</span>
           </div>
+          <div>
+            <strong>{progress.experiencePoints ?? 0}</strong>
+            <span>experience points</span>
+          </div>
         </div>
       </section>
 

@@ -54,9 +54,15 @@ export function CoursesPage({ progress }: CoursesPageProps) {
                     key={course.id}
                     to={`/course/${course.id}`}
                   >
-                    <div className="course-orb">
+                    <div className={`course-orb course-orb-${course.accent}`}>
                       <span className="course-orb-ring" />
                       <span className="course-orb-moon" />
+                      <span className="course-orb-bands" />
+                      <span className="course-orb-spot" />
+                      <span className="course-orb-cap course-orb-cap-top" />
+                      <span className="course-orb-cap course-orb-cap-bottom" />
+                      <span className="course-orb-continent course-orb-continent-one" />
+                      <span className="course-orb-continent course-orb-continent-two" />
                     </div>
                     <div className="node-eyebrow">
                       {course.level} · {lessons.length} lessons

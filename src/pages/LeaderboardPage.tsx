@@ -1,4 +1,8 @@
-import { getLeaderboard, getLoginLeaderboard } from "../lib/achievements";
+import {
+  getLeaderboard,
+  getLoginLeaderboard,
+  getXpLeaderboard,
+} from "../lib/achievements";
 import type { AppProgress } from "../types/content";
 
 interface LeaderboardPageProps {
@@ -8,6 +12,7 @@ interface LeaderboardPageProps {
 export function LeaderboardPage({ progress }: LeaderboardPageProps) {
   const correctBoard = getLeaderboard(progress);
   const loginBoard = getLoginLeaderboard(progress);
+  const xpBoard = getXpLeaderboard(progress);
 
   return (
     <main className="page leaderboard-page">
@@ -15,13 +20,15 @@ export function LeaderboardPage({ progress }: LeaderboardPageProps) {
         <div className="eyebrow">Leaderboard</div>
         <h1>Keep the streak alive.</h1>
         <p>
-          Compare correct-answer streaks and login streaks. Sample learners keep
-          the board lively while your real stats update as you work.
+          Compare correct-answer streaks, login streaks, and total experience.
+          Sample learners keep the board lively while your real stats update as
+          you work.
         </p>
       </section>
       <div className="leaderboard-grid">
         <LeaderboardTable title="Longest correct streak" rows={correctBoard} metric="correctStreak" />
         <LeaderboardTable title="Longest login streak" rows={loginBoard} metric="loginStreak" />
+        <LeaderboardTable title="Most experience" rows={xpBoard} metric="experiencePoints" />
       </div>
     </main>
   );
@@ -31,6 +38,7 @@ interface Row {
   name: string;
   correctStreak: number;
   loginStreak: number;
+  experiencePoints: number;
   isCurrentUser?: boolean;
 }
 
@@ -41,7 +49,7 @@ function LeaderboardTable({
 }: {
   title: string;
   rows: Row[];
-  metric: "correctStreak" | "loginStreak";
+  metric: "correctStreak" | "loginStreak" | "experiencePoints";
 }) {
   return (
     <section className="panel leaderboard-card">
