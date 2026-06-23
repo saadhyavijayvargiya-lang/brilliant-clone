@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import type { User } from "firebase/auth";
 import type { AppProgress } from "../types/content";
 import { useMemo, useState } from "react";
+import { Logo } from "./Logo";
 
 interface TopBarProps {
   progress: AppProgress;
@@ -20,8 +21,7 @@ export function TopBar({ progress, user, onSignOut }: TopBarProps) {
   return (
     <header className="topbar">
       <Link to="/" className="brand" aria-label="Pathwise home">
-        <span className="brand-mark">P</span>
-        <span>Pathwise</span>
+        <Logo />
       </Link>
       <nav className="topnav" aria-label="Primary navigation">
         <NavLink to="/courses">Courses</NavLink>

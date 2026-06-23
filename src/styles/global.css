@@ -341,14 +341,37 @@ a {
   letter-spacing: -0.03em;
 }
 
-.brand-mark {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border-radius: 0.75rem;
-  background: var(--accent-primary);
-  color: white;
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logo-mark {
+  display: inline-flex;
+  width: 2.3rem;
+  height: 2.3rem;
+  filter: drop-shadow(0 6px 18px rgba(108, 92, 231, 0.45));
+  transition: transform 220ms ease;
+}
+
+.logo-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand:hover .logo-mark {
+  transform: translateY(-1px) rotate(-3deg);
+}
+
+.logo-word {
+  font-size: 1.18rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(100deg, #ffffff 10%, #b9acff 45%, #00f0d4 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .topnav a {
