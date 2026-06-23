@@ -47,7 +47,6 @@ export function HistogramSim({
           onChange={(event) => {
             const nextStepCount = Number(event.target.value);
             setStepCount(nextStepCount);
-            runTrials(nextStepCount);
           }}
         />
       </label>

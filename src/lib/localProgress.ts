@@ -96,9 +96,7 @@ export function markStepComplete(
       [lessonId]: {
         lessonId,
         completedStepIds,
-        currentStepIndex: lessonCompleted
-          ? totalSteps - 1
-          : Math.min(stepIndex + 1, totalSteps - 1),
+        currentStepIndex: Math.min(stepIndex, totalSteps - 1),
         completedAt: lessonCompleted
           ? current.completedAt ?? new Date().toISOString()
           : current.completedAt,
