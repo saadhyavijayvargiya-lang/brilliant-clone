@@ -1,4 +1,5 @@
 import { courses, getLessonsForCourse } from "../content/course";
+import { getAchievements } from "../lib/achievements";
 import { getLessonProgress } from "../lib/localProgress";
 import type { AppProgress } from "../types/content";
 
@@ -26,6 +27,8 @@ export function ProfilePage({ progress }: ProfilePageProps) {
   );
   const overallPct =
     totalSteps === 0 ? 0 : Math.round((completedSteps / totalSteps) * 100);
+  const achievements = getAchievements(progress);
+  const unlockedAchievements = achievements.filter((achievement) => achievement.unlocked);
 
   return (
     <main className="page profile-page">
@@ -51,6 +54,18 @@ export function ProfilePage({ progress }: ProfilePageProps) {
             <strong>{overallPct}%</strong>
             <span>overall progress</span>
           </div>
+          <div>
+            <strong>{progress.currentCorrectStreak ?? 0}</strong>
+            <span>current correct streak</span>
+          </div>
+          <div>
+            <strong>{progress.longestCorrectStreak ?? 0}</strong>
+            <span>best correct streak</span>
+          </div>
+          <div>
+            <strong>{unlockedAchievements.length}</strong>
+            <span>achievements</span>
+          </div>
         </div>
       </section>
 
@@ -64,6 +79,26 @@ export function ProfilePage({ progress }: ProfilePageProps) {
             <button className="sample-avatar" key={avatar}>
               {avatar}
             </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="subject-heading">
+          <h2>Achievements</h2>
+          <span>{unlockedAchievements.length}/{achievements.length} unlocked</span>
+        </div>
+        <div className="achievement-grid">
+          {achievements.map((achievement) => (
+            <article
+              className={`achievement-card ${
+                achievement.unlocked ? "achievement-unlocked" : ""
+              }`}
+              key={achievement.id}
+            >
+              <strong>{achievement.title}</strong>
+              <span>{achievement.description}</span>
+            </article>
           ))}
         </div>
       </section>

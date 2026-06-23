@@ -7,6 +7,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { CoursePage } from "./pages/CoursePage";
 import { CoursesPage } from "./pages/CoursesPage";
 import { HomePage } from "./pages/HomePage";
+import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { LessonPage } from "./pages/LessonPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,8 @@ import { useEffect, useRef, useState } from "react";
 export default function App() {
   const { user, loading, error, signInWithEmail, signUpWithEmail, signInWithGoogle, logOut } =
     useAuth();
-  const { progress, completeStep, goToStep, replaceProgress } = useLocalProgress();
+  const { progress, completeStep, goToStep, recordIncorrect, replaceProgress } =
+    useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const hydratedUserRef = useRef<string | null>(null);
 
@@ -68,10 +70,12 @@ export default function App() {
               progress={progress}
               onCompleteStep={completeStep}
               onGoToStep={goToStep}
+              onIncorrectAnswer={recordIncorrect}
             />
           }
         />
         <Route path="/profile" element={<ProfilePage progress={progress} />} />
+        <Route path="/leaderboard" element={<LeaderboardPage progress={progress} />} />
         <Route
           path="/auth"
           element={

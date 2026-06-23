@@ -995,7 +995,8 @@ a {
 }
 
 .average-widget,
-.ruin-widget {
+.ruin-widget,
+.target-widget {
   gap: 1rem;
 }
 
@@ -1079,6 +1080,70 @@ a {
   background: linear-gradient(90deg, var(--accent-correct), var(--accent-primary));
 }
 
+.target-copy {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.target-copy strong {
+  color: var(--text-primary);
+}
+
+.target-stage {
+  position: relative;
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(15, 17, 23, 0.45);
+}
+
+.target-line {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  left: 1rem;
+  height: 2px;
+  background: var(--border);
+}
+
+.target-flag,
+.target-runner {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.target-flag {
+  top: 28%;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 206, 201, 0.16);
+  color: var(--accent-correct);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.target-runner {
+  top: 50%;
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-correct));
+  box-shadow: 0 0 32px rgba(108, 92, 231, 0.4);
+  color: white;
+  font-weight: 900;
+  transition: left 380ms ease;
+}
+
+.path-chip-active {
+  border-color: var(--accent-correct);
+  color: var(--accent-correct);
+}
+
 .profile-page {
   display: grid;
   gap: 1rem;
@@ -1143,6 +1208,74 @@ a {
   color: var(--text-secondary);
 }
 
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.achievement-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.035);
+  opacity: 0.52;
+}
+
+.achievement-unlocked {
+  border-color: rgba(0, 206, 201, 0.42);
+  background: rgba(0, 206, 201, 0.08);
+  opacity: 1;
+}
+
+.achievement-card span {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.leaderboard-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.leaderboard-card ol {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0;
+  margin: 1rem 0 0;
+  list-style: none;
+}
+
+.leaderboard-card li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.leaderboard-card .rank {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.leaderboard-card .you-row {
+  border-color: rgba(108, 92, 231, 0.65);
+  background: rgba(108, 92, 231, 0.12);
+}
+
 .lesson-controls,
 .completion-card {
   margin-top: 1rem;
@@ -1175,6 +1308,8 @@ a {
   }
 
   .course-grid,
+  .achievement-grid,
+  .leaderboard-grid,
   .profile-hero,
   .profile-course-item,
   .state-diagram {

@@ -8,6 +8,8 @@ export function defaultProgress(): AppProgress {
     streakCount: 0,
     lastActiveDate: null,
     activeDates: [],
+    currentCorrectStreak: 0,
+    longestCorrectStreak: 0,
     lessonProgress: {},
     completedLessons: [],
   };
@@ -86,10 +88,19 @@ export function markStepComplete(
   const completedStepIds = current.completedStepIds.includes(stepId)
     ? current.completedStepIds
     : [...current.completedStepIds, stepId];
+  const alreadyCompleted = current.completedStepIds.includes(stepId);
+  const currentCorrectStreak = alreadyCompleted
+    ? activeProgress.currentCorrectStreak
+    : (activeProgress.currentCorrectStreak ?? 0) + 1;
   const lessonCompleted = completedStepIds.length >= totalSteps;
 
   const nextProgress: AppProgress = {
     ...activeProgress,
+    currentCorrectStreak,
+    longestCorrectStreak: Math.max(
+      activeProgress.longestCorrectStreak ?? 0,
+      currentCorrectStreak
+    ),
     completedLessons: lessonCompleted
       ? [...new Set([...activeProgress.completedLessons, lessonId])]
       : activeProgress.completedLessons,
@@ -106,6 +117,15 @@ export function markStepComplete(
     },
   };
 
+  saveProgress(nextProgress);
+  return nextProgress;
+}
+
+export function markIncorrect(progress: AppProgress): AppProgress {
+  const nextProgress = {
+    ...markActivity(progress),
+    currentCorrectStreak: 0,
+  };
   saveProgress(nextProgress);
   return nextProgress;
 }

@@ -25,6 +25,7 @@ export function TopBar({ progress, user, onSignOut }: TopBarProps) {
       </Link>
       <nav className="topnav" aria-label="Primary navigation">
         <NavLink to="/courses">Courses</NavLink>
+        <NavLink to="/leaderboard">Leaderboard</NavLink>
         <NavLink to="/profile">Profile</NavLink>
         {user ? (
           <button className="link-button nav-action" onClick={onSignOut}>

@@ -7,14 +7,21 @@ import { MarkovChainSim } from "../widgets/MarkovChainSim";
 import { RandomWalkSim } from "../widgets/RandomWalkSim";
 import { RunningAverageSim } from "../widgets/RunningAverageSim";
 import { GamblerRuinSim } from "../widgets/GamblerRuinSim";
+import { TargetPathSim } from "../widgets/TargetPathSim";
 
 interface StepRendererProps {
   step: LessonStep;
   onComplete: (summary?: Record<string, number | string>) => void;
+  onIncorrect: () => void;
   isComplete: boolean;
 }
 
-export function StepRenderer({ step, onComplete, isComplete }: StepRendererProps) {
+export function StepRenderer({
+  step,
+  onComplete,
+  onIncorrect,
+  isComplete,
+}: StepRendererProps) {
   const [answer, setAnswer] = useState("");
   const [selectedChoice, setSelectedChoice] = useState("");
   const [attempts, setAttempts] = useState(0);
@@ -40,6 +47,7 @@ export function StepRenderer({ step, onComplete, isComplete }: StepRendererProps
 
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
+    onIncorrect();
     setFeedbackKind("wrong");
     setFeedback(
       nextAttempts >= 2 && step.feedback.hint
@@ -121,6 +129,16 @@ export function StepRenderer({ step, onComplete, isComplete }: StepRendererProps
             start={Number(params.start ?? 5)}
             goal={Number(params.goal ?? 10)}
             p={Number(params.p ?? 0.5)}
+            onComplete={markComplete}
+          />
+        );
+
+      case "target-path-sim":
+        return (
+          <TargetPathSim
+            start={Number(params.start ?? 0)}
+            target={Number(params.target ?? 3)}
+            moves={Number(params.moves ?? 5)}
             onComplete={markComplete}
           />
         );

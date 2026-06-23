@@ -8,6 +8,7 @@ export type WidgetType =
   | "markov-chain-sim"
   | "running-average-sim"
   | "gambler-ruin-sim"
+  | "target-path-sim"
   | "choice-input"
   | "number-input";
 
@@ -80,6 +81,8 @@ export interface AppProgress {
   streakCount: number;
   lastActiveDate: string | null;
   activeDates: string[];
+  currentCorrectStreak: number;
+  longestCorrectStreak: number;
   lessonProgress: Record<string, LessonProgress>;
   completedLessons: string[];
 }

@@ -13,12 +13,14 @@ interface LessonPageProps {
     totalSteps: number
   ) => void;
   onGoToStep: (lessonId: string, stepIndex: number) => void;
+  onIncorrectAnswer: () => void;
 }
 
 export function LessonPage({
   progress,
   onCompleteStep,
   onGoToStep,
+  onIncorrectAnswer,
 }: LessonPageProps) {
   const { lessonId } = useParams();
   if (!lessonId) return <Navigate to="/course" replace />;
@@ -90,6 +92,7 @@ export function LessonPage({
           key={step.id}
           step={step}
           isComplete={isStepComplete}
+          onIncorrect={onIncorrectAnswer}
           onComplete={() =>
             onCompleteStep(lesson.id, step.id, stepIndex, steps.length)
           }

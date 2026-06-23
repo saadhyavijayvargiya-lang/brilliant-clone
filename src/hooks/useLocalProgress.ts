@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AppProgress } from "../types/content";
 import {
   loadProgress,
+  markIncorrect,
   markStepComplete,
   saveProgress,
   setCurrentStep,
@@ -27,10 +28,14 @@ export function useLocalProgress() {
     setProgressState((current) => setCurrentStep(current, lessonId, stepIndex));
   }, []);
 
+  const recordIncorrect = useCallback(() => {
+    setProgressState((current) => markIncorrect(current));
+  }, []);
+
   const replaceProgress = useCallback((nextProgress: AppProgress) => {
     setProgressState(nextProgress);
     saveProgress(nextProgress);
   }, []);
 
-  return { progress, completeStep, goToStep, replaceProgress };
+  return { progress, completeStep, goToStep, recordIncorrect, replaceProgress };
 }
