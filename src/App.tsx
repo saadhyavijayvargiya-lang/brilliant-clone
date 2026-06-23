@@ -15,7 +15,14 @@ import { useEffect, useRef, useState } from "react";
 export default function App() {
   const { user, loading, error, signInWithEmail, signUpWithEmail, signInWithGoogle, logOut } =
     useAuth();
-  const { progress, completeStep, goToStep, recordIncorrect, replaceProgress } =
+  const {
+    progress,
+    completeStep,
+    goToStep,
+    recordIncorrect,
+    replaceProgress,
+    updateDisplayName,
+  } =
     useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const hydratedUserRef = useRef<string | null>(null);
@@ -26,9 +33,10 @@ export default function App() {
     loadRemoteProgress(user)
       .then((remoteProgress) => {
         if (remoteProgress) {
-          replaceProgress(remoteProgress);
+          replaceProgress(withAccountDefaultName(remoteProgress, user));
           setSyncMessage("Progress loaded.");
         } else {
+          updateDisplayName(getAccountDisplayName(user), false);
           setSyncMessage("Signed in. Progress will sync across devices.");
         }
       })
@@ -74,7 +82,15 @@ export default function App() {
             />
           }
         />
-        <Route path="/profile" element={<ProfilePage progress={progress} />} />
+        <Route
+          path="/profile"
+          element={
+            <ProfilePage
+              progress={progress}
+              onDisplayNameChange={(name) => updateDisplayName(name, true)}
+            />
+          }
+        />
         <Route path="/leaderboard" element={<LeaderboardPage progress={progress} />} />
         <Route
           path="/auth"
@@ -101,4 +117,18 @@ function getSyncError(err: unknown): string {
     return `Sync skipped: ${err.message}`;
   }
   return "Sync skipped. Progress is still saved on this device.";
+}
+
+function getAccountDisplayName(user: { displayName: string | null; email: string | null }) {
+  return user.displayName?.trim() || user.email?.split("@")[0] || "Learner";
+}
+
+function withAccountDefaultName<T extends { displayName: string; hasCustomDisplayName?: boolean }>(
+  progress: T,
+  user: { displayName: string | null; email: string | null }
+): T {
+  if (progress.hasCustomDisplayName || progress.displayName !== "Learner") {
+    return progress;
+  }
+  return { ...progress, displayName: getAccountDisplayName(user), hasCustomDisplayName: false };
 }

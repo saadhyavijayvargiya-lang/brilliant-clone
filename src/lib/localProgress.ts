@@ -5,6 +5,7 @@ const STORAGE_KEY = "pathwise-progress";
 export function defaultProgress(): AppProgress {
   return {
     displayName: "Learner",
+    hasCustomDisplayName: false,
     streakCount: 0,
     lastActiveDate: null,
     activeDates: [],
@@ -13,6 +14,21 @@ export function defaultProgress(): AppProgress {
     lessonProgress: {},
     completedLessons: [],
   };
+}
+
+export function setDisplayName(
+  progress: AppProgress,
+  displayName: string,
+  isCustom: boolean
+): AppProgress {
+  const cleanedName = displayName.trim() || "Learner";
+  const nextProgress = {
+    ...progress,
+    displayName: cleanedName,
+    hasCustomDisplayName: isCustom,
+  };
+  saveProgress(nextProgress);
+  return nextProgress;
 }
 
 export function loadProgress(): AppProgress {

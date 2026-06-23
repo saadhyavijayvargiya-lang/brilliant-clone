@@ -2,12 +2,19 @@ import { courses, getLessonsForCourse } from "../content/course";
 import { getAchievements } from "../lib/achievements";
 import { getLessonProgress } from "../lib/localProgress";
 import type { AppProgress } from "../types/content";
+import { FormEvent, useEffect, useState } from "react";
 
 interface ProfilePageProps {
   progress: AppProgress;
+  onDisplayNameChange: (displayName: string) => void;
 }
 
-export function ProfilePage({ progress }: ProfilePageProps) {
+export function ProfilePage({ progress, onDisplayNameChange }: ProfilePageProps) {
+  const [draftName, setDraftName] = useState(progress.displayName);
+
+  useEffect(() => {
+    setDraftName(progress.displayName);
+  }, [progress.displayName]);
   const totalLessons = courses.reduce(
     (sum, course) => sum + getLessonsForCourse(course.id).length,
     0
@@ -30,6 +37,11 @@ export function ProfilePage({ progress }: ProfilePageProps) {
   const achievements = getAchievements(progress);
   const unlockedAchievements = achievements.filter((achievement) => achievement.unlocked);
 
+  function submitName(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    onDisplayNameChange(draftName);
+  }
+
   return (
     <main className="page profile-page">
       <section className="panel profile-hero">
@@ -40,6 +52,19 @@ export function ProfilePage({ progress }: ProfilePageProps) {
           <div className="eyebrow">Profile</div>
           <h1>{progress.displayName}</h1>
           <p>Your learning map, streak, and course completion at a glance.</p>
+          <form className="profile-name-form" onSubmit={submitName}>
+            <label>
+              <span>Display name</span>
+              <input
+                value={draftName}
+                onChange={(event) => setDraftName(event.target.value)}
+                placeholder="Your name"
+              />
+            </label>
+            <button className="button button-small" type="submit">
+              Save
+            </button>
+          </form>
         </div>
         <div className="stats-grid">
           <div>

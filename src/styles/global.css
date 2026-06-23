@@ -49,10 +49,10 @@ a {
   position: sticky;
   top: 0;
   z-index: 5;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 1rem;
-  justify-content: space-between;
+  gap: clamp(1rem, 3vw, 2rem);
   padding: 0.85rem clamp(1rem, 4vw, 3rem);
   border-bottom: 1px solid var(--border);
   background: rgba(15, 17, 23, 0.86);
@@ -99,6 +99,11 @@ a {
 .topnav a {
   color: var(--text-secondary);
   font-weight: 600;
+}
+
+.topnav {
+  justify-content: center;
+  gap: clamp(1.2rem, 3vw, 2.25rem);
 }
 
 .topnav a.active,
@@ -329,9 +334,10 @@ a {
 
 .courses-hero h1 {
   margin: 0;
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  line-height: 0.95;
-  letter-spacing: -0.07em;
+  font-size: clamp(2.25rem, 6vw, 4.35rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  max-width: 11ch;
 }
 
 .courses-hero p {
@@ -1173,6 +1179,33 @@ a {
   font-weight: 900;
 }
 
+.profile-name-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+  max-width: 420px;
+  margin-top: 1rem;
+}
+
+.profile-name-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.profile-name-form input {
+  min-height: 42px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  outline: none;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
 .avatar-row {
   display: flex;
   flex-wrap: wrap;
@@ -1283,12 +1316,17 @@ a {
 
 @media (max-width: 760px) {
   .topbar {
+    grid-template-columns: 1fr auto;
     align-items: flex-start;
+  }
+
+  .topnav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
     flex-wrap: wrap;
   }
 
   .streak-pill {
-    width: 100%;
     justify-content: center;
   }
 
@@ -1299,6 +1337,10 @@ a {
   }
 
   .inline-answer {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-name-form {
     grid-template-columns: 1fr;
   }
 

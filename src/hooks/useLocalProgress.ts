@@ -6,6 +6,7 @@ import {
   markStepComplete,
   saveProgress,
   setCurrentStep,
+  setDisplayName,
 } from "../lib/localProgress";
 
 export function useLocalProgress() {
@@ -37,5 +38,19 @@ export function useLocalProgress() {
     saveProgress(nextProgress);
   }, []);
 
-  return { progress, completeStep, goToStep, recordIncorrect, replaceProgress };
+  const updateDisplayName = useCallback(
+    (displayName: string, isCustom = true) => {
+      setProgressState((current) => setDisplayName(current, displayName, isCustom));
+    },
+    []
+  );
+
+  return {
+    progress,
+    completeStep,
+    goToStep,
+    recordIncorrect,
+    replaceProgress,
+    updateDisplayName,
+  };
 }
