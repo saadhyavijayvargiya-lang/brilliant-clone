@@ -6,6 +6,8 @@ export type WidgetType =
   | "histogram-sim"
   | "bias-slider-sim"
   | "markov-chain-sim"
+  | "running-average-sim"
+  | "gambler-ruin-sim"
   | "choice-input"
   | "number-input";
 

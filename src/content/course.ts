@@ -5,7 +5,7 @@ export const beginnerCourse: Course = {
   title: "Beginner Probability",
   description:
     "Build intuition for chance, complements, and expected value through quick visual exercises.",
-  lessonIds: ["B1", "B2"],
+  lessonIds: ["B1", "B2", "B3", "B4", "B5"],
   subject: "Probability",
   level: "Beginner",
   accent: "cyan",
@@ -16,7 +16,7 @@ export const intermediateCourse: Course = {
   title: "Intermediate Probability",
   description:
     "Move from random walks to Markov chains: distributions, drift, and state-based systems.",
-  lessonIds: ["L1", "L2", "L3", "M1"],
+  lessonIds: ["L1", "L2", "L3", "M1", "L6", "L7", "M2", "M3"],
   subject: "Probability",
   level: "Intermediate",
   accent: "violet",
@@ -27,7 +27,7 @@ export const advancedCourse: Course = {
   title: "Advanced Probability",
   description:
     "Preview gambler's ruin, hitting boundaries, and long-run behavior with more challenging simulations.",
-  lessonIds: ["A1", "A2"],
+  lessonIds: ["A1", "A2", "A3", "A4", "A5"],
   subject: "Probability",
   level: "Advanced",
   accent: "gold",
@@ -38,6 +38,263 @@ export const courses: Course[] = [
   intermediateCourse,
   advancedCourse,
 ];
+
+const extraLessonSpecs = [
+  {
+    id: "B3",
+    courseId: beginnerCourse.id,
+    order: 3,
+    title: "Expected Value Playground",
+    description: "Average simple random rewards and see expected value appear.",
+    unlockAfter: "B2",
+    widget: "running-average-sim",
+    prompt: "Run coin-reward trials and watch the average payout settle down.",
+    expectedQuestion: "A fair coin pays 2 points for Heads and 0 for Tails. What is the expected payout?",
+    expectedAnswer: 1,
+  },
+  {
+    id: "B4",
+    courseId: beginnerCourse.id,
+    order: 4,
+    title: "Dice and Counting",
+    description: "Count equally likely outcomes with dice and small samples.",
+    unlockAfter: "B3",
+    widget: "running-average-sim",
+    prompt: "Roll a die repeatedly and watch the sample average approach 3.5.",
+    expectedQuestion: "What is the average value of a fair six-sided die?",
+    expectedAnswer: 3.5,
+  },
+  {
+    id: "B5",
+    courseId: beginnerCourse.id,
+    order: 5,
+    title: "Simulation Habits",
+    description: "Use repeated trials to check intuition before calculating.",
+    unlockAfter: "B4",
+    widget: "histogram-sim",
+    prompt: "Run repeated fair-walk trials and compare the picture to your guess.",
+    expectedQuestion: "If a simulation average keeps moving, what usually helps it stabilize?",
+    expectedAnswer: "Run more trials",
+  },
+  {
+    id: "L6",
+    courseId: intermediateCourse.id,
+    order: 5,
+    title: "Expected Position by Simulation",
+    description: "Add many random walks to a running average and see expected value.",
+    unlockAfter: "M1",
+    widget: "running-average-sim",
+    prompt: "Add batches of random walks and watch the running average final position.",
+    expectedQuestion: "For a fair walk, what value should the running average drift toward?",
+    expectedAnswer: 0,
+  },
+  {
+    id: "L7",
+    courseId: intermediateCourse.id,
+    order: 6,
+    title: "Typical Distance",
+    description: "Connect simulation spread to the square-root rule.",
+    unlockAfter: "L6",
+    widget: "histogram-sim",
+    prompt: "Change the number of steps and observe how typical distance grows.",
+    expectedQuestion: "About how far is one typical spread for a 400-step fair walk?",
+    expectedAnswer: 20,
+  },
+  {
+    id: "M2",
+    courseId: intermediateCourse.id,
+    order: 7,
+    title: "Two-State Game Chains",
+    description: "Model win/lose states with transition probabilities.",
+    unlockAfter: "L7",
+    widget: "markov-chain-sim",
+    prompt: "Treat Sunny as Winning and Rainy as Losing, then simulate streaks.",
+    expectedQuestion: "A sticky winning state means wins tend to...",
+    expectedAnswer: "Cluster together",
+  },
+  {
+    id: "M3",
+    courseId: intermediateCourse.id,
+    order: 8,
+    title: "Web Surfer Chains",
+    description: "Think of a visitor hopping between pages as a Markov chain.",
+    unlockAfter: "M2",
+    widget: "markov-chain-sim",
+    prompt: "Simulate state hops and interpret them as page-to-page movement.",
+    expectedQuestion: "In a Markov chain, the next page depends most directly on...",
+    expectedAnswer: "The current page",
+  },
+  {
+    id: "A3",
+    courseId: advancedCourse.id,
+    order: 3,
+    title: "Gambler's Ruin Lab",
+    description: "Simulate bankroll paths until they hit win or ruin.",
+    unlockAfter: "A2",
+    widget: "gambler-ruin-sim",
+    prompt: "Run many bankroll games and estimate the chance of ruin.",
+    expectedQuestion: "With a fair game and equal boundaries, ruin probability is closest to...",
+    expectedAnswer: 0.5,
+  },
+  {
+    id: "A4",
+    courseId: advancedCourse.id,
+    order: 4,
+    title: "Rare Event Estimation",
+    description: "Use lots of trials to estimate events that do not happen often.",
+    unlockAfter: "A3",
+    widget: "histogram-sim",
+    prompt: "Run a large batch and inspect the thin tails of the distribution.",
+    expectedQuestion: "Rare-event estimates usually need...",
+    expectedAnswer: "Many trials",
+  },
+  {
+    id: "A5",
+    courseId: advancedCourse.id,
+    order: 5,
+    title: "Equilibrium Lab",
+    description: "See long-run proportions emerge from repeated state transitions.",
+    unlockAfter: "A4",
+    widget: "markov-chain-sim",
+    prompt: "Run the chain repeatedly and look for stable proportions.",
+    expectedQuestion: "A long-run equilibrium describes...",
+    expectedAnswer: "Average behavior over many steps",
+  },
+] as const;
+
+const extraLessons: Lesson[] = extraLessonSpecs.map((spec) => ({
+  id: spec.id,
+  courseId: spec.courseId,
+  order: spec.order,
+  title: spec.title,
+  description: spec.description,
+  stepIds: Array.from({ length: 5 }, (_, index) => `${spec.id}-S${index + 1}`),
+  unlockAfter: spec.unlockAfter,
+  estimatedMinutes: 5,
+}));
+
+function makeExtraSteps(): LessonStep[] {
+  return extraLessonSpecs.flatMap((spec) => {
+    const isNumeric = typeof spec.expectedAnswer === "number";
+    return [
+      {
+        id: `${spec.id}-S1`,
+        lessonId: spec.id,
+        order: 1,
+        type: "simulation",
+        title: "Simulate first",
+        body: spec.prompt,
+        interaction: {
+          widget: spec.widget,
+          params:
+            spec.widget === "running-average-sim"
+              ? { trialsPerBatch: 50, mode: spec.id === "B4" ? "die" : "walk" }
+              : spec.widget === "gambler-ruin-sim"
+                ? { trials: 300, start: 5, goal: 10, p: 0.5 }
+                : spec.widget === "markov-chain-sim"
+                  ? { days: 14, sunnyToSunny: 0.72, rainyToRainy: 0.64 }
+                  : { defaultSteps: 80, trials: 1000 },
+          validation: { type: "completion" },
+        },
+        feedback: {
+          correct: "Good. Simulation gives you something concrete to reason from before answering.",
+          incorrect: "Run the simulation at least once.",
+          hint: "Press the run button and watch the average or path update.",
+        },
+      },
+      {
+        id: `${spec.id}-S2`,
+        lessonId: spec.id,
+        order: 2,
+        type: isNumeric ? "input" : "choice",
+        title: "Make the key prediction",
+        body: spec.expectedQuestion,
+        interaction: {
+          widget: isNumeric ? "number-input" : "choice-input",
+          params: isNumeric
+            ? { label: "Your answer" }
+            : {
+                options: [
+                  spec.expectedAnswer,
+                  "One lucky trial",
+                  "The first result only",
+                ],
+              },
+          validation: isNumeric
+            ? { type: "exact", expected: spec.expectedAnswer, tolerance: 0.01 }
+            : { type: "choice", expected: spec.expectedAnswer },
+        },
+        feedback: {
+          correct: "Correct. The simulation and the calculation are pointing to the same idea.",
+          incorrect: "Not quite. Use the simulation trend, not one noisy result.",
+          hint: "Look for the value or phrase that describes repeated-trial behavior.",
+        },
+      },
+      {
+        id: `${spec.id}-S3`,
+        lessonId: spec.id,
+        order: 3,
+        type: "choice",
+        title: "Noise versus signal",
+        body: "Why can a short simulation still disagree with the expected pattern?",
+        interaction: {
+          widget: "choice-input",
+          params: {
+            options: [
+              "Random samples are noisy",
+              "Expected value stops working",
+              "The probabilities disappear",
+            ],
+          },
+          validation: { type: "choice", expected: "Random samples are noisy" },
+        },
+        feedback: {
+          correct: "Exactly. Short runs can be misleading; repeated runs reveal the pattern.",
+          incorrect: "Expected patterns are long-run ideas, so small samples can wiggle.",
+          hint: "Think about why a coin can have short streaks.",
+        },
+      },
+      {
+        id: `${spec.id}-S4`,
+        lessonId: spec.id,
+        order: 4,
+        type: "choice",
+        title: "What should you trust?",
+        body: "When one trial and a thousand trials disagree, which is usually more informative?",
+        interaction: {
+          widget: "choice-input",
+          params: {
+            options: ["One trial", "A thousand trials", "Neither ever helps"],
+          },
+          validation: { type: "choice", expected: "A thousand trials" },
+        },
+        feedback: {
+          correct: "Right. More trials usually reduce the noise in your estimate.",
+          incorrect: "One trial can be interesting, but it is too noisy to summarize the system.",
+          hint: "Large samples average out more randomness.",
+        },
+      },
+      {
+        id: `${spec.id}-S5`,
+        lessonId: spec.id,
+        order: 5,
+        type: "explain",
+        title: "Lesson checkpoint",
+        body: "The habit is: predict, simulate, compare, then refine. This makes harder probability questions feel less abstract.",
+        interaction: {
+          widget: "none",
+          validation: { type: "completion" },
+        },
+        feedback: {
+          correct: "Lesson complete. Keep using simulation as a bridge from intuition to calculation.",
+          incorrect: "",
+        },
+      },
+    ] satisfies LessonStep[];
+  });
+}
+
+const extraSteps = makeExtraSteps();
 
 export const lessons: Lesson[] = [
   {
@@ -149,6 +406,7 @@ export const lessons: Lesson[] = [
     unlockAfter: "A1",
     estimatedMinutes: 6,
   },
+  ...extraLessons,
 ];
 
 export const steps: LessonStep[] = [
@@ -1081,6 +1339,7 @@ export const steps: LessonStep[] = [
       incorrect: "",
     },
   },
+  ...extraSteps,
 ];
 
 export function getLesson(lessonId: string): Lesson | undefined {

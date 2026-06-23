@@ -5,6 +5,8 @@ import { BiasSliderSim } from "../widgets/BiasSliderSim";
 import { HistogramSim } from "../widgets/HistogramSim";
 import { MarkovChainSim } from "../widgets/MarkovChainSim";
 import { RandomWalkSim } from "../widgets/RandomWalkSim";
+import { RunningAverageSim } from "../widgets/RunningAverageSim";
+import { GamblerRuinSim } from "../widgets/GamblerRuinSim";
 
 interface StepRendererProps {
   step: LessonStep;
@@ -99,6 +101,26 @@ export function StepRenderer({ step, onComplete, isComplete }: StepRendererProps
             days={Number(params.days ?? 10)}
             sunnyToSunny={Number(params.sunnyToSunny ?? 0.75)}
             rainyToRainy={Number(params.rainyToRainy ?? 0.6)}
+            onComplete={markComplete}
+          />
+        );
+
+      case "running-average-sim":
+        return (
+          <RunningAverageSim
+            trialsPerBatch={Number(params.trialsPerBatch ?? 50)}
+            mode={params.mode === "die" ? "die" : "walk"}
+            onComplete={markComplete}
+          />
+        );
+
+      case "gambler-ruin-sim":
+        return (
+          <GamblerRuinSim
+            trials={Number(params.trials ?? 300)}
+            start={Number(params.start ?? 5)}
+            goal={Number(params.goal ?? 10)}
+            p={Number(params.p ?? 0.5)}
             onComplete={markComplete}
           />
         );
