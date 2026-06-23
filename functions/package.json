@@ -1,0 +1,20 @@
+{
+  "name": "pathwise-functions",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0",
+    "pathwise": "file:.."
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
