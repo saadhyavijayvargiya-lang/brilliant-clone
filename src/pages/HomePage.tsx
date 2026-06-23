@@ -12,8 +12,8 @@ export function HomePage() {
           that remembers where you stopped.
         </p>
         <div className="hero-actions">
-          <Link className="button" to="/course">
-            Start the course
+          <Link className="button" to="/courses">
+            Browse courses
           </Link>
           <Link className="button button-secondary" to="/lesson/L1">
             Jump into lesson 1

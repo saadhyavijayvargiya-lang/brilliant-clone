@@ -75,5 +75,5 @@ export function useAuth() {
 
 function getAuthErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
-  return "Authentication failed. Check your Firebase Auth providers.";
+  return "Authentication failed. Check that sign-in is enabled for this app.";
 }

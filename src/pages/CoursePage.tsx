@@ -1,5 +1,6 @@
+import { Link, Navigate, useParams } from "react-router-dom";
 import { CoursePath } from "../components/CoursePath";
-import { course } from "../content/course";
+import { getCourse, getLessonsForCourse } from "../content/course";
 import type { AppProgress } from "../types/content";
 
 interface CoursePageProps {
@@ -7,28 +8,46 @@ interface CoursePageProps {
 }
 
 export function CoursePage({ progress }: CoursePageProps) {
+  const { courseId } = useParams();
+  if (!courseId) return <Navigate to="/courses" replace />;
+
+  const course = getCourse(courseId);
+  if (!course) return <Navigate to="/courses" replace />;
+
+  const courseLessons = getLessonsForCourse(course.id);
+  const totalSteps = courseLessons.reduce(
+    (sum, lesson) => sum + lesson.stepIds.length,
+    0
+  );
+  const completedInCourse = courseLessons.filter((lesson) =>
+    progress.completedLessons.includes(lesson.id)
+  ).length;
+
   return (
     <main className="page two-column">
       <section className="panel course-intro">
-        <div className="eyebrow">MVP path</div>
+        <Link className="back-link" to="/courses">
+          ← All courses
+        </Link>
+        <div className="eyebrow">{course.subject} · {course.level}</div>
         <h1>{course.title}</h1>
         <p>{course.description}</p>
         <div className="stats-grid">
           <div>
-            <strong>3</strong>
-            <span>MVP lessons</span>
+            <strong>{courseLessons.length}</strong>
+            <span>lessons</span>
           </div>
           <div>
-            <strong>16</strong>
+            <strong>{totalSteps}</strong>
             <span>interactive steps</span>
           </div>
           <div>
-            <strong>{progress.completedLessons.length}</strong>
+            <strong>{completedInCourse}</strong>
             <span>completed</span>
           </div>
         </div>
       </section>
-      <CoursePath progress={progress} />
+      <CoursePath course={course} lessons={courseLessons} progress={progress} />
     </main>
   );
 }

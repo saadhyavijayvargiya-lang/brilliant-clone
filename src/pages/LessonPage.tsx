@@ -33,7 +33,7 @@ export function LessonPage({
         <section className="panel">
           <h1>{lesson.title}</h1>
           <p>This lesson is locked. Complete the previous lesson first.</p>
-          <Link className="button" to="/course">
+          <Link className="button" to={`/course/${lesson.courseId}`}>
             Back to course
           </Link>
         </section>
@@ -42,6 +42,19 @@ export function LessonPage({
   }
 
   const steps = getLessonSteps(lesson.id);
+  if (steps.length === 0) {
+    return (
+      <main className="page narrow-page">
+        <section className="panel">
+          <h1>{lesson.title}</h1>
+          <p>This stretch lesson is still being prepared.</p>
+          <Link className="button" to={`/course/${lesson.courseId}`}>
+            Back to course
+          </Link>
+        </section>
+      </main>
+    );
+  }
   const lessonProgress = getLessonProgress(progress, lesson.id);
   const stepIndex = Math.min(lessonProgress.currentStepIndex, steps.length - 1);
   const step = steps[stepIndex];
@@ -51,7 +64,7 @@ export function LessonPage({
   return (
     <main className="page lesson-layout">
       <aside className="panel lesson-sidebar">
-        <Link className="back-link" to="/course">
+        <Link className="back-link" to={`/course/${lesson.courseId}`}>
           ← Course
         </Link>
         <div className="eyebrow">Lesson {lesson.order}</div>
@@ -104,7 +117,7 @@ export function LessonPage({
               Nice work. Head back to the path to unlock the next lesson and keep
               your streak going.
             </p>
-            <Link className="button" to="/course">
+            <Link className="button" to={`/course/${lesson.courseId}`}>
               View course path
             </Link>
           </div>

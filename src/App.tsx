@@ -5,6 +5,7 @@ import { useLocalProgress } from "./hooks/useLocalProgress";
 import { loadRemoteProgress, saveRemoteProgress } from "./lib/firestoreProgress";
 import { AuthPage } from "./pages/AuthPage";
 import { CoursePage } from "./pages/CoursePage";
+import { CoursesPage } from "./pages/CoursesPage";
 import { HomePage } from "./pages/HomePage";
 import { LessonPage } from "./pages/LessonPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -24,9 +25,9 @@ export default function App() {
       .then((remoteProgress) => {
         if (remoteProgress) {
           replaceProgress(remoteProgress);
-          setSyncMessage("Progress loaded from Firebase.");
+          setSyncMessage("Progress loaded.");
         } else {
-          setSyncMessage("Signed in. Local progress will sync to Firebase.");
+          setSyncMessage("Signed in. Progress will sync across devices.");
         }
       })
       .catch((err: unknown) => {
@@ -51,7 +52,9 @@ export default function App() {
       {syncMessage ? <div className="status-banner">{syncMessage}</div> : null}
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/course" element={<CoursePage progress={progress} />} />
+        <Route path="/courses" element={<CoursesPage progress={progress} />} />
+        <Route path="/course" element={<Navigate to="/courses" replace />} />
+        <Route path="/course/:courseId" element={<CoursePage progress={progress} />} />
         <Route
           path="/lesson/:lessonId"
           element={
@@ -85,7 +88,7 @@ export default function App() {
 
 function getSyncError(err: unknown): string {
   if (err instanceof Error) {
-    return `Firebase sync skipped: ${err.message}`;
+    return `Sync skipped: ${err.message}`;
   }
-  return "Firebase sync skipped. Local progress is still saved.";
+  return "Sync skipped. Progress is still saved on this device.";
 }

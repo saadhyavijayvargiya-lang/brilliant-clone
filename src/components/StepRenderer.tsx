@@ -3,6 +3,7 @@ import { validateAnswer } from "../lib/validators";
 import type { LessonStep } from "../types/content";
 import { BiasSliderSim } from "../widgets/BiasSliderSim";
 import { HistogramSim } from "../widgets/HistogramSim";
+import { MarkovChainSim } from "../widgets/MarkovChainSim";
 import { RandomWalkSim } from "../widgets/RandomWalkSim";
 
 interface StepRendererProps {
@@ -88,6 +89,16 @@ export function StepRenderer({ step, onComplete, isComplete }: StepRendererProps
             defaultP={Number(params.defaultP ?? 0.6)}
             steps={Number(params.steps ?? 100)}
             paths={Number(params.paths ?? 30)}
+            onComplete={markComplete}
+          />
+        );
+
+      case "markov-chain-sim":
+        return (
+          <MarkovChainSim
+            days={Number(params.days ?? 10)}
+            sunnyToSunny={Number(params.sunnyToSunny ?? 0.75)}
+            rainyToRainy={Number(params.rainyToRainy ?? 0.6)}
             onComplete={markComplete}
           />
         );

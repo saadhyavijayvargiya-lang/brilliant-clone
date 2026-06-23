@@ -5,6 +5,7 @@ export type WidgetType =
   | "random-walk-sim"
   | "histogram-sim"
   | "bias-slider-sim"
+  | "markov-chain-sim"
   | "choice-input"
   | "number-input";
 
@@ -58,6 +59,9 @@ export interface Course {
   title: string;
   description: string;
   lessonIds: string[];
+  subject: string;
+  level: string;
+  accent: string;
 }
 
 export type LessonStatus = "locked" | "available" | "in_progress" | "completed";

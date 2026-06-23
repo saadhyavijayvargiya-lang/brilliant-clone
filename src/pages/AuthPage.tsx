@@ -54,7 +54,7 @@ export function AuthPage({
         <section className="panel">
           <div className="eyebrow">Signed in</div>
           <h1>{user.displayName ?? user.email ?? "Learner"}</h1>
-          <p>Your progress will sync to Firebase when Firestore rules and Auth are enabled.</p>
+          <p>Your progress is saved and ready whenever you return.</p>
           <button className="button" onClick={onSignOut}>
             Sign out
           </button>
@@ -66,11 +66,11 @@ export function AuthPage({
   return (
     <main className="page narrow-page">
       <section className="panel">
-        <div className="eyebrow">Firebase Auth</div>
+        <div className="eyebrow">Account</div>
         <h1>{mode === "signin" ? "Welcome back" : "Create account"}</h1>
         <p>
-          Sign in to sync progress across devices. If Auth providers are not
-          enabled yet, local progress still works.
+          Sign in to keep your progress across devices and continue your streak
+          wherever you study.
         </p>
         {error ? <div className="feedback feedback-wrong">{error}</div> : null}
         <form className="auth-form" onSubmit={submit}>

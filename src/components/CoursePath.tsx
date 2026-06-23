@@ -1,15 +1,16 @@
 import { Link } from "react-router-dom";
-import { lessons } from "../content/course";
 import { getLessonProgress, getLessonStatus } from "../lib/localProgress";
-import type { AppProgress } from "../types/content";
+import type { AppProgress, Course, Lesson } from "../types/content";
 
 interface CoursePathProps {
+  course: Course;
+  lessons: Lesson[];
   progress: AppProgress;
 }
 
-export function CoursePath({ progress }: CoursePathProps) {
+export function CoursePath({ course, lessons, progress }: CoursePathProps) {
   return (
-    <ol className="course-path">
+    <ol className={`planet-path planet-path-${course.accent}`}>
       {lessons.map((lesson) => {
         const status = getLessonStatus(progress, lesson.id, lesson.unlockAfter);
         const lessonProgress = getLessonProgress(progress, lesson.id);
@@ -19,9 +20,13 @@ export function CoursePath({ progress }: CoursePathProps) {
         const isPlayable = status !== "locked" && lesson.stepIds.length > 0;
 
         return (
-          <li key={lesson.id} className={`lesson-node lesson-node-${status}`}>
-            <div className="node-marker">{lesson.order}</div>
-            <div className="node-card">
+          <li
+            key={lesson.id}
+            className={`planet-node planet-node-${status} planet-node-${lesson.order % 2 === 0 ? "right" : "left"}`}
+          >
+            <div className="orbit-line" />
+            <div className="planet-marker">{lesson.order}</div>
+            <div className="planet-card">
               <div className="node-eyebrow">
                 Lesson {lesson.order} · {lesson.estimatedMinutes} min
               </div>

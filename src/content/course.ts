@@ -6,7 +6,23 @@ export const course: Course = {
   description:
     "Learn stochastic intuition by stepping, simulating, predicting, and correcting your way through fair walks, spread, and drift.",
   lessonIds: ["L1", "L2", "L3", "L4", "L5"],
+  subject: "Probability",
+  level: "Beginner",
+  accent: "violet",
 };
+
+export const markovCourse: Course = {
+  id: "markov-chains",
+  title: "Markov Chains",
+  description:
+    "Explore systems that hop between states, settle into patterns, and predict the next step using only the present.",
+  lessonIds: ["M1"],
+  subject: "Probability",
+  level: "Beginner",
+  accent: "cyan",
+};
+
+export const courses: Course[] = [course, markovCourse];
 
 export const lessons: Lesson[] = [
   {
@@ -15,7 +31,16 @@ export const lessons: Lesson[] = [
     order: 1,
     title: "Your First Random Walk",
     description: "Turn fair coin flips into movement on a number line.",
-    stepIds: ["L1-S1", "L1-S2", "L1-S3", "L1-S4", "L1-S5", "L1-S6"],
+    stepIds: [
+      "L1-S1",
+      "L1-S2",
+      "L1-S3",
+      "L1-S4",
+      "L1-S5",
+      "L1-S6",
+      "L1-S7",
+      "L1-S8",
+    ],
     unlockAfter: null,
     estimatedMinutes: 4,
   },
@@ -25,7 +50,7 @@ export const lessons: Lesson[] = [
     order: 2,
     title: "Where Do You Land?",
     description: "Run many walks and watch the terminal distribution spread out.",
-    stepIds: ["L2-S1", "L2-S2", "L2-S3", "L2-S4", "L2-S5"],
+    stepIds: ["L2-S1", "L2-S2", "L2-S3", "L2-S4", "L2-S5", "L2-S6", "L2-S7"],
     unlockAfter: "L1",
     estimatedMinutes: 4,
   },
@@ -35,7 +60,7 @@ export const lessons: Lesson[] = [
     order: 3,
     title: "Drift and Bias",
     description: "Bias the coin and discover how expected position changes.",
-    stepIds: ["L3-S1", "L3-S2", "L3-S3", "L3-S4", "L3-S5"],
+    stepIds: ["L3-S1", "L3-S2", "L3-S3", "L3-S4", "L3-S5", "L3-S6", "L3-S7"],
     unlockAfter: "L2",
     estimatedMinutes: 4,
   },
@@ -58,6 +83,16 @@ export const lessons: Lesson[] = [
     stepIds: [],
     unlockAfter: "L4",
     estimatedMinutes: 4,
+  },
+  {
+    id: "M1",
+    courseId: markovCourse.id,
+    order: 1,
+    title: "Weather as a Markov Chain",
+    description: "Model sunny and rainy days with state transitions.",
+    stepIds: ["M1-S1", "M1-S2", "M1-S3", "M1-S4", "M1-S5", "M1-S6", "M1-S7"],
+    unlockAfter: null,
+    estimatedMinutes: 6,
   },
 ];
 
@@ -260,8 +295,51 @@ export const steps: LessonStep[] = [
     lessonId: "L2",
     order: 5,
     type: "explain",
-    title: "The big idea",
+    title: "The big idea so far",
     body: "Random walks do not drift when fair, but they do diffuse. The center stays near 0 while the cloud gets wider.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Good. Next, connect the visual spread to probability language.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "L2-S6",
+    lessonId: "L2",
+    order: 6,
+    type: "choice",
+    title: "What does the histogram estimate?",
+    body: "Each bar in the histogram counts how often repeated walks landed in that region. What does a taller bar mean?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "That landing region appeared more often",
+          "The walker moved faster there",
+          "The coin became biased",
+        ],
+      },
+      validation: {
+        type: "choice",
+        expected: "That landing region appeared more often",
+      },
+    },
+    feedback: {
+      correct: "Right. The histogram is a visual estimate of probability from repeated trials.",
+      incorrect: "A histogram counts outcomes. Taller means more repeated walks landed there.",
+      hint: "Think of each trial as one vote for its final position.",
+    },
+  },
+  {
+    id: "L2-S7",
+    lessonId: "L2",
+    order: 7,
+    type: "explain",
+    title: "Distribution intuition",
+    body: "A distribution is not one answer. It is a map of many possible answers and how often they happen. Random walks teach this because individual paths are noisy but the histogram is stable.",
     interaction: {
       widget: "none",
       validation: { type: "completion" },
@@ -348,14 +426,236 @@ export const steps: LessonStep[] = [
     lessonId: "L3",
     order: 5,
     type: "explain",
-    title: "The big idea",
+    title: "Drift versus spread",
     body: "Fair walks spread without drifting. Biased walks still spread, but their center moves at speed 2p - 1 per step.",
     interaction: {
       widget: "none",
       validation: { type: "completion" },
     },
     feedback: {
-      correct: "You finished the MVP random-walk arc: motion, spread, and drift.",
+      correct: "Exactly. Bias moves the center; randomness still creates spread around it.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "L3-S6",
+    lessonId: "L3",
+    order: 6,
+    type: "choice",
+    title: "Two walkers race",
+    body: "Walker A has p(+1)=0.52. Walker B has p(+1)=0.58. After many 200-step races, who tends to be farther right?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["Walker A", "Walker B", "They are tied"] },
+      validation: { type: "choice", expected: "Walker B" },
+    },
+    feedback: {
+      correct: "Correct. Both are noisy, but Walker B has the larger positive drift.",
+      incorrect: "Compare the two biases. The larger p(+1) creates the larger average drift.",
+      hint: "0.58 is farther above 0.5 than 0.52.",
+    },
+  },
+  {
+    id: "L3-S7",
+    lessonId: "L3",
+    order: 7,
+    type: "explain",
+    title: "Course checkpoint",
+    body: "You have built the core random-walk intuition: a path is random, many paths form a distribution, and bias shifts the center of that distribution.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Random Walks checkpoint complete. Try Markov Chains next to learn how random systems move between named states.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "L1-S7",
+    lessonId: "L1",
+    order: 7,
+    type: "choice",
+    title: "Can a fair walk still wander far?",
+    body: "If the coin is fair, is it possible for a path to end far from 0 after many steps?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "Yes, but it is less common than landing near 0",
+          "No, fairness forces every path to stay near 0",
+          "Only if the coin changes halfway through",
+        ],
+      },
+      validation: {
+        type: "choice",
+        expected: "Yes, but it is less common than landing near 0",
+      },
+    },
+    feedback: {
+      correct: "Exactly. Fairness controls the average, not every individual path.",
+      incorrect: "Fair walks can wander. They just do not prefer left or right on average.",
+      hint: "A long streak of Heads is possible even with a fair coin.",
+    },
+  },
+  {
+    id: "L1-S8",
+    lessonId: "L1",
+    order: 8,
+    type: "explain",
+    title: "Lesson checkpoint",
+    body: "A fair random walk is centered but not still. The walker can wander, return, overshoot, and surprise you — that is why the next lesson studies many walks at once.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Lesson complete. Continue to distributions to see the pattern hiding inside the noise.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "M1-S1",
+    lessonId: "M1",
+    order: 1,
+    type: "simulation",
+    title: "A tiny weather machine",
+    body: "A Markov chain hops between states. Here the states are Sunny and Rainy. Change the transition chances and run a week of weather.",
+    interaction: {
+      widget: "markov-chain-sim",
+      params: { days: 10, sunnyToSunny: 0.75, rainyToRainy: 0.6 },
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Nice. You just simulated a Markov chain: tomorrow depended only on today's weather.",
+      incorrect: "Run the weather chain to generate a sequence.",
+      hint: "Press Run chain and watch the state hops.",
+    },
+  },
+  {
+    id: "M1-S2",
+    lessonId: "M1",
+    order: 2,
+    type: "choice",
+    title: "What does memoryless mean?",
+    body: "In this weather chain, tomorrow depends on today's state. What does it ignore?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "All earlier days before today",
+          "Today's weather",
+          "The transition chances",
+        ],
+      },
+      validation: { type: "choice", expected: "All earlier days before today" },
+    },
+    feedback: {
+      correct: "Right. Markov chains use the present state, not the full history.",
+      incorrect: "The chain uses today's state and transition chances. It ignores older history.",
+      hint: "The Markov rule says: the present is enough.",
+    },
+  },
+  {
+    id: "M1-S3",
+    lessonId: "M1",
+    order: 3,
+    type: "input",
+    title: "One-step probability",
+    body: "If today is Sunny and P(Sunny tomorrow | Sunny today)=0.75, what is P(Rainy tomorrow | Sunny today)?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Probability of Rainy" },
+      validation: { type: "exact", expected: 0.25, tolerance: 0.001 },
+    },
+    feedback: {
+      correct: "Correct. The row must add to 1, so 1 - 0.75 = 0.25.",
+      incorrect: "The probabilities from one state must add to 1.",
+      hint: "Subtract the sunny-to-sunny probability from 1.",
+    },
+  },
+  {
+    id: "M1-S4",
+    lessonId: "M1",
+    order: 4,
+    type: "choice",
+    title: "Sticky states",
+    body: "If P(Rainy tomorrow | Rainy today) increases, what happens to rainy streaks?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "Rainy streaks become more common",
+          "Rainy streaks disappear",
+          "Sunny days become guaranteed",
+        ],
+      },
+      validation: { type: "choice", expected: "Rainy streaks become more common" },
+    },
+    feedback: {
+      correct: "Exactly. A state is sticky when it tends to stay itself.",
+      incorrect: "Higher Rainy→Rainy means rain is more likely to persist.",
+      hint: "Think of the chain staying in the Rainy state.",
+    },
+  },
+  {
+    id: "M1-S5",
+    lessonId: "M1",
+    order: 5,
+    type: "input",
+    title: "Expected rainy days",
+    body: "If a long-run weather chain is rainy about 40% of the time, how many rainy days do you expect in a 10-day stretch?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Expected rainy days" },
+      validation: { type: "exact", expected: 4, tolerance: 0 },
+    },
+    feedback: {
+      correct: "Yes. 40% of 10 days is 4 rainy days on average.",
+      incorrect: "Convert 40% to 0.4, then multiply by 10.",
+      hint: "0.4 × 10 = ?",
+    },
+  },
+  {
+    id: "M1-S6",
+    lessonId: "M1",
+    order: 6,
+    type: "choice",
+    title: "Why Markov chains matter",
+    body: "Which system is naturally modeled as states with transition probabilities?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "A website visitor moving page to page",
+          "A single fixed number",
+          "A shape with no changes",
+        ],
+      },
+      validation: {
+        type: "choice",
+        expected: "A website visitor moving page to page",
+      },
+    },
+    feedback: {
+      correct: "Right. Markov chains are useful when systems move among states.",
+      incorrect: "Look for a process that hops from one state to another.",
+      hint: "Pages, weather, board games, and queues can all have states.",
+    },
+  },
+  {
+    id: "M1-S7",
+    lessonId: "M1",
+    order: 7,
+    type: "explain",
+    title: "Lesson checkpoint",
+    body: "A Markov chain is a random state machine. Once you know the current state and the transition probabilities, you can simulate what comes next.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Markov Chains lesson complete. You now have a second probability course path finished end to end.",
       incorrect: "",
     },
   },
@@ -363,6 +663,18 @@ export const steps: LessonStep[] = [
 
 export function getLesson(lessonId: string): Lesson | undefined {
   return lessons.find((lesson) => lesson.id === lessonId);
+}
+
+export function getCourse(courseId: string): Course | undefined {
+  return courses.find((item) => item.id === courseId);
+}
+
+export function getLessonsForCourse(courseId: string): Lesson[] {
+  const selectedCourse = getCourse(courseId);
+  if (!selectedCourse) return [];
+  return selectedCourse.lessonIds
+    .map((lessonId) => lessons.find((lesson) => lesson.id === lessonId))
+    .filter((lesson): lesson is Lesson => Boolean(lesson));
 }
 
 export function getLessonSteps(lessonId: string): LessonStep[] {
