@@ -74,6 +74,7 @@ export function LessonPage({
       </aside>
       <div>
         <StepRenderer
+          key={step.id}
           step={step}
           isComplete={isStepComplete}
           onComplete={() =>
