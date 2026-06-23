@@ -1,33 +1,48 @@
 import type { Course, Lesson, LessonStep } from "../types/content";
 
-export const course: Course = {
-  id: "random-walks",
-  title: "Random Walks",
+export const beginnerCourse: Course = {
+  id: "beginner-probability",
+  title: "Beginner Probability",
   description:
-    "Learn stochastic intuition by stepping, simulating, predicting, and correcting your way through fair walks, spread, and drift.",
-  lessonIds: ["L1", "L2", "L3", "L4", "L5"],
-  subject: "Probability",
-  level: "Beginner",
-  accent: "violet",
-};
-
-export const markovCourse: Course = {
-  id: "markov-chains",
-  title: "Markov Chains",
-  description:
-    "Explore systems that hop between states, settle into patterns, and predict the next step using only the present.",
-  lessonIds: ["M1"],
+    "Build intuition for chance, complements, and expected value through quick visual exercises.",
+  lessonIds: ["B1", "B2"],
   subject: "Probability",
   level: "Beginner",
   accent: "cyan",
 };
 
-export const courses: Course[] = [course, markovCourse];
+export const intermediateCourse: Course = {
+  id: "intermediate-probability",
+  title: "Intermediate Probability",
+  description:
+    "Move from random walks to Markov chains: distributions, drift, and state-based systems.",
+  lessonIds: ["L1", "L2", "L3", "M1"],
+  subject: "Probability",
+  level: "Intermediate",
+  accent: "violet",
+};
+
+export const advancedCourse: Course = {
+  id: "advanced-probability",
+  title: "Advanced Probability",
+  description:
+    "Preview gambler's ruin, hitting boundaries, and long-run behavior with more challenging simulations.",
+  lessonIds: ["A1", "A2"],
+  subject: "Probability",
+  level: "Advanced",
+  accent: "gold",
+};
+
+export const courses: Course[] = [
+  beginnerCourse,
+  intermediateCourse,
+  advancedCourse,
+];
 
 export const lessons: Lesson[] = [
   {
     id: "L1",
-    courseId: course.id,
+    courseId: intermediateCourse.id,
     order: 1,
     title: "Your First Random Walk",
     description: "Turn fair coin flips into movement on a number line.",
@@ -46,7 +61,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "L2",
-    courseId: course.id,
+    courseId: intermediateCourse.id,
     order: 2,
     title: "Where Do You Land?",
     description: "Run many walks and watch the terminal distribution spread out.",
@@ -56,7 +71,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "L3",
-    courseId: course.id,
+    courseId: intermediateCourse.id,
     order: 3,
     title: "Drift and Bias",
     description: "Bias the coin and discover how expected position changes.",
@@ -66,7 +81,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "L4",
-    courseId: course.id,
+    courseId: advancedCourse.id,
     order: 4,
     title: "Gambler's Ruin",
     description: "Stretch lesson: absorbing boundaries and ruin probability.",
@@ -76,7 +91,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "L5",
-    courseId: course.id,
+    courseId: advancedCourse.id,
     order: 5,
     title: "The Reflection Trick",
     description: "Stretch lesson: symmetry and hitting probabilities.",
@@ -86,12 +101,52 @@ export const lessons: Lesson[] = [
   },
   {
     id: "M1",
-    courseId: markovCourse.id,
-    order: 1,
+    courseId: intermediateCourse.id,
+    order: 4,
     title: "Weather as a Markov Chain",
     description: "Model sunny and rainy days with state transitions.",
     stepIds: ["M1-S1", "M1-S2", "M1-S3", "M1-S4", "M1-S5", "M1-S6", "M1-S7"],
+    unlockAfter: "L3",
+    estimatedMinutes: 6,
+  },
+  {
+    id: "B1",
+    courseId: beginnerCourse.id,
+    order: 1,
+    title: "Chance as a Number",
+    description: "Learn probability as a scale from impossible to certain.",
+    stepIds: ["B1-S1", "B1-S2", "B1-S3", "B1-S4", "B1-S5"],
     unlockAfter: null,
+    estimatedMinutes: 5,
+  },
+  {
+    id: "B2",
+    courseId: beginnerCourse.id,
+    order: 2,
+    title: "Complements and Either-Or",
+    description: "Use opposites and simple combinations to reason faster.",
+    stepIds: ["B2-S1", "B2-S2", "B2-S3", "B2-S4", "B2-S5"],
+    unlockAfter: "B1",
+    estimatedMinutes: 5,
+  },
+  {
+    id: "A1",
+    courseId: advancedCourse.id,
+    order: 1,
+    title: "Boundary Hitting",
+    description: "Explore when a walk reaches a target before falling back.",
+    stepIds: ["A1-S1", "A1-S2", "A1-S3", "A1-S4", "A1-S5"],
+    unlockAfter: null,
+    estimatedMinutes: 6,
+  },
+  {
+    id: "A2",
+    courseId: advancedCourse.id,
+    order: 2,
+    title: "Long-Run State Behavior",
+    description: "See how random systems settle into long-run proportions.",
+    stepIds: ["A2-S1", "A2-S2", "A2-S3", "A2-S4", "A2-S5"],
+    unlockAfter: "A1",
     estimatedMinutes: 6,
   },
 ];
@@ -656,6 +711,373 @@ export const steps: LessonStep[] = [
     },
     feedback: {
       correct: "Markov Chains lesson complete. You now have a second probability course path finished end to end.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "B1-S1",
+    lessonId: "B1",
+    order: 1,
+    type: "choice",
+    title: "Impossible, maybe, certain",
+    body: "Which probability means an event is certain to happen?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["0", "0.5", "1"] },
+      validation: { type: "choice", expected: "1" },
+    },
+    feedback: {
+      correct: "Exactly. Probability 1 means the event always happens.",
+      incorrect: "The probability scale runs from 0 to 1.",
+      hint: "Certain is the top of the probability scale.",
+    },
+  },
+  {
+    id: "B1-S2",
+    lessonId: "B1",
+    order: 2,
+    type: "input",
+    title: "A fair coin",
+    body: "A fair coin has two equally likely sides. What is P(Heads)?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "P(Heads)" },
+      validation: { type: "exact", expected: 0.5, tolerance: 0.001 },
+    },
+    feedback: {
+      correct: "Right. One favorable side out of two equally likely sides is 1/2 = 0.5.",
+      incorrect: "Heads is one of two equally likely outcomes.",
+      hint: "Write one half as a decimal.",
+    },
+  },
+  {
+    id: "B1-S3",
+    lessonId: "B1",
+    order: 3,
+    type: "choice",
+    title: "Probability as a fraction",
+    body: "A bag has 3 blue marbles and 1 red marble. What is P(blue)?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["1/4", "3/4", "4/3"] },
+      validation: { type: "choice", expected: "3/4" },
+    },
+    feedback: {
+      correct: "Correct. There are 3 blue marbles out of 4 total.",
+      incorrect: "Count favorable outcomes over total outcomes.",
+      hint: "Blue marbles are favorable; all marbles are possible.",
+    },
+  },
+  {
+    id: "B1-S4",
+    lessonId: "B1",
+    order: 4,
+    type: "input",
+    title: "Percent to decimal",
+    body: "What decimal probability is the same as 25%?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Decimal probability" },
+      validation: { type: "exact", expected: 0.25, tolerance: 0.001 },
+    },
+    feedback: {
+      correct: "Yes. 25% means 25 out of 100, or 0.25.",
+      incorrect: "Divide the percent by 100.",
+      hint: "25 ÷ 100 = ?",
+    },
+  },
+  {
+    id: "B1-S5",
+    lessonId: "B1",
+    order: 5,
+    type: "explain",
+    title: "Probability is a scale",
+    body: "Probability measures how often an event should happen in the long run. 0 is impossible, 1 is certain, and values in between describe uncertainty.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Lesson complete. Next, use complements to reason about what does not happen.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "B2-S1",
+    lessonId: "B2",
+    order: 1,
+    type: "choice",
+    title: "Complement rule",
+    body: "If P(rain) = 0.3, what is P(no rain)?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["0.3", "0.7", "1.3"] },
+      validation: { type: "choice", expected: "0.7" },
+    },
+    feedback: {
+      correct: "Right. Complements add to 1, so 1 - 0.3 = 0.7.",
+      incorrect: "An event and its complement must add to 1.",
+      hint: "Subtract the rain probability from 1.",
+    },
+  },
+  {
+    id: "B2-S2",
+    lessonId: "B2",
+    order: 2,
+    type: "input",
+    title: "Not rolling a six",
+    body: "On a fair six-sided die, what is the probability of not rolling a 6?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "P(not 6)" },
+      validation: { type: "exact", expected: 0.833, tolerance: 0.01 },
+    },
+    feedback: {
+      correct: "Correct. Five of the six faces are not 6, so 5/6 is about 0.833.",
+      incorrect: "Only one face is a 6. The other five faces are not.",
+      hint: "Use 5/6 as a decimal.",
+    },
+  },
+  {
+    id: "B2-S3",
+    lessonId: "B2",
+    order: 3,
+    type: "choice",
+    title: "Either event",
+    body: "A spinner has 4 equal colors: red, blue, green, yellow. What is P(red or blue)?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["1/4", "1/2", "3/4"] },
+      validation: { type: "choice", expected: "1/2" },
+    },
+    feedback: {
+      correct: "Exactly. Red or blue covers 2 of the 4 equal sections.",
+      incorrect: "Count how many sections match red or blue.",
+      hint: "2 favorable sections out of 4 total sections.",
+    },
+  },
+  {
+    id: "B2-S4",
+    lessonId: "B2",
+    order: 4,
+    type: "input",
+    title: "At least one heads",
+    body: "Flip two fair coins. Use the complement: what is P(at least one Heads)?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Probability" },
+      validation: { type: "exact", expected: 0.75, tolerance: 0.001 },
+    },
+    feedback: {
+      correct: "Yes. The only complement is TT, so 1 - 1/4 = 3/4.",
+      incorrect: "The complement of at least one Heads is no Heads at all.",
+      hint: "No Heads means both flips are Tails.",
+    },
+  },
+  {
+    id: "B2-S5",
+    lessonId: "B2",
+    order: 5,
+    type: "explain",
+    title: "Think from the other side",
+    body: "Complements are often easier than direct counting. If an event is complicated, ask what would make it fail.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Beginner Probability complete. Try Intermediate Probability when you are ready for simulations.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "A1-S1",
+    lessonId: "A1",
+    order: 1,
+    type: "simulation",
+    title: "Race to a boundary",
+    body: "Run a biased walk and watch how often it climbs upward before wandering back. Boundary problems ask which target gets hit first.",
+    interaction: {
+      widget: "bias-slider-sim",
+      params: { defaultP: 0.55, steps: 80, paths: 24 },
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Good. A tiny drift can make upper-boundary hits noticeably more common.",
+      incorrect: "Run the paths to compare drift and spread.",
+      hint: "Try p = 0.55 and look at the mean line.",
+    },
+  },
+  {
+    id: "A1-S2",
+    lessonId: "A1",
+    order: 2,
+    type: "choice",
+    title: "Upper boundary advantage",
+    body: "If a walker has p(+1)=0.55, which boundary is more likely to be reached first: +10 or -10?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["+10", "-10", "They are exactly tied"] },
+      validation: { type: "choice", expected: "+10" },
+    },
+    feedback: {
+      correct: "Correct. The upward drift favors the +10 boundary.",
+      incorrect: "The +1 step is slightly more likely than the -1 step.",
+      hint: "Bias points toward the upper boundary.",
+    },
+  },
+  {
+    id: "A1-S3",
+    lessonId: "A1",
+    order: 3,
+    type: "input",
+    title: "Fair start symmetry",
+    body: "In a fair walk starting halfway between 0 and 10, what is the probability of hitting 10 before 0?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Probability" },
+      validation: { type: "exact", expected: 0.5, tolerance: 0.001 },
+    },
+    feedback: {
+      correct: "Right. Halfway between equal boundaries gives a symmetric 50/50 chance.",
+      incorrect: "The start is exactly centered between the two boundaries.",
+      hint: "Symmetry splits the chance evenly.",
+    },
+  },
+  {
+    id: "A1-S4",
+    lessonId: "A1",
+    order: 4,
+    type: "choice",
+    title: "Closer boundary",
+    body: "In a fair walk between 0 and 10, starting at 2 makes which boundary more likely?",
+    interaction: {
+      widget: "choice-input",
+      params: { options: ["0", "10", "They are tied"] },
+      validation: { type: "choice", expected: "0" },
+    },
+    feedback: {
+      correct: "Exactly. Starting closer to 0 makes 0 easier to hit first.",
+      incorrect: "With no drift, distance to the boundary matters.",
+      hint: "You are only 2 steps from 0 but 8 from 10.",
+    },
+  },
+  {
+    id: "A1-S5",
+    lessonId: "A1",
+    order: 5,
+    type: "explain",
+    title: "Boundary intuition",
+    body: "Boundary problems combine drift, spread, and starting position. Small changes can strongly affect which target gets hit first.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Boundary Hitting complete. Next, study long-run behavior.",
+      incorrect: "",
+    },
+  },
+  {
+    id: "A2-S1",
+    lessonId: "A2",
+    order: 1,
+    type: "simulation",
+    title: "Return to the weather chain",
+    body: "Run a sticky two-state chain. Even random systems can settle into stable long-run proportions.",
+    interaction: {
+      widget: "markov-chain-sim",
+      params: { days: 14, sunnyToSunny: 0.8, rainyToRainy: 0.7 },
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Nice. A longer chain gives more evidence about its long-run mix.",
+      incorrect: "Run the chain to produce a sequence of states.",
+      hint: "Use the Run chain button.",
+    },
+  },
+  {
+    id: "A2-S2",
+    lessonId: "A2",
+    order: 2,
+    type: "choice",
+    title: "Sticky sunshine",
+    body: "If Sunny→Sunny is very high, what do you expect in the sequence?",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "Longer sunny streaks",
+          "No sunny days",
+          "Alternating sun and rain every day",
+        ],
+      },
+      validation: { type: "choice", expected: "Longer sunny streaks" },
+    },
+    feedback: {
+      correct: "Correct. High self-transition probabilities create streaks.",
+      incorrect: "A sticky state tends to repeat itself.",
+      hint: "Sunny→Sunny means staying sunny.",
+    },
+  },
+  {
+    id: "A2-S3",
+    lessonId: "A2",
+    order: 3,
+    type: "input",
+    title: "A long-run estimate",
+    body: "If a chain spends 65% of days sunny in the long run, how many sunny days do you expect in 20 days?",
+    interaction: {
+      widget: "number-input",
+      params: { label: "Sunny days" },
+      validation: { type: "exact", expected: 13, tolerance: 0 },
+    },
+    feedback: {
+      correct: "Yes. 0.65 × 20 = 13 sunny days.",
+      incorrect: "Multiply the long-run proportion by the number of days.",
+      hint: "65% of 20 is 13.",
+    },
+  },
+  {
+    id: "A2-S4",
+    lessonId: "A2",
+    order: 4,
+    type: "choice",
+    title: "Stable does not mean fixed",
+    body: "A long-run proportion of 65% sunny means...",
+    interaction: {
+      widget: "choice-input",
+      params: {
+        options: [
+          "Every 20-day run has exactly 13 sunny days",
+          "Over many days, the average share tends toward 65%",
+          "The chain stops being random",
+        ],
+      },
+      validation: {
+        type: "choice",
+        expected: "Over many days, the average share tends toward 65%",
+      },
+    },
+    feedback: {
+      correct: "Exactly. Long-run behavior is a tendency, not a guarantee for every short run.",
+      incorrect: "The chain remains random even when its averages stabilize.",
+      hint: "Think average over many repetitions, not exact every time.",
+    },
+  },
+  {
+    id: "A2-S5",
+    lessonId: "A2",
+    order: 5,
+    type: "explain",
+    title: "Advanced checkpoint",
+    body: "You now have the core pieces behind many stochastic models: states, transitions, boundaries, drift, and long-run averages.",
+    interaction: {
+      widget: "none",
+      validation: { type: "completion" },
+    },
+    feedback: {
+      correct: "Advanced Probability complete. You have finished all current probability paths.",
       incorrect: "",
     },
   },

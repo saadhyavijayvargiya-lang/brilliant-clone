@@ -45,6 +45,12 @@ export default function App() {
     return () => window.clearTimeout(timeout);
   }, [loading, progress, user]);
 
+  useEffect(() => {
+    if (!syncMessage) return;
+    const timeout = window.setTimeout(() => setSyncMessage(null), 4200);
+    return () => window.clearTimeout(timeout);
+  }, [syncMessage]);
+
   return (
     <div className="app-shell">
       <TopBar progress={progress} user={user} onSignOut={logOut} />

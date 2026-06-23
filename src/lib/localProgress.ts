@@ -7,6 +7,7 @@ export function defaultProgress(): AppProgress {
     displayName: "Learner",
     streakCount: 0,
     lastActiveDate: null,
+    activeDates: [],
     lessonProgress: {},
     completedLessons: [],
   };
@@ -67,6 +68,7 @@ export function markActivity(progress: AppProgress): AppProgress {
   return {
     ...progress,
     lastActiveDate: today,
+    activeDates: [...new Set([...(progress.activeDates ?? []), today])],
     streakCount:
       progress.lastActiveDate === yesterdayString ? progress.streakCount + 1 : 1,
   };

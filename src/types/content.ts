@@ -77,6 +77,7 @@ export interface AppProgress {
   displayName: string;
   streakCount: number;
   lastActiveDate: string | null;
+  activeDates: string[];
   lessonProgress: Record<string, LessonProgress>;
   completedLessons: string[];
 }
