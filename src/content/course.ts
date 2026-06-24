@@ -365,6 +365,597 @@ const extraExplanations: Record<string, string[]> = {
   ],
 };
 
+interface Followup {
+  title: string;
+  body: string;
+  answer: number | string;
+  options?: string[];
+  correct: string;
+  incorrect: string;
+  hint: string;
+  teach: string;
+}
+
+interface FollowupSet {
+  summary: string;
+  questions: [Followup, Followup];
+}
+
+const extraFollowups: Record<string, FollowupSet> = {
+  B3: {
+    summary:
+      "Expected value is a probability-weighted average of the payouts. Compute it once and you know the long-run average reward per trial.",
+    questions: [
+      {
+        title: "Change the payout",
+        body: "If the coin instead pays 4 points for Heads and 0 for Tails, what is the expected payout?",
+        answer: 2,
+        correct: "Yes. (1/2)(4) + (1/2)(0) = 2 — double the payout, double the expectation.",
+        incorrect: "Weight each payout by 1/2 and add.",
+        hint: "Half of 4 plus half of 0.",
+        teach: "Expected value scales with the payouts: doubling every reward doubles the expectation.",
+      },
+      {
+        title: "What expected value means",
+        body: "Expected value is best described as which of these?",
+        options: [
+          "The long-run average per trial",
+          "The most common single result",
+          "The largest possible payout",
+        ],
+        answer: "The long-run average per trial",
+        correct: "Right. It is the average over many repeats, not any single outcome.",
+        incorrect: "It is an average across many trials, not a single result.",
+        hint: "Think many repeats, then average.",
+        teach: "Expected value answers 'what do I get per trial on average over the long run?'",
+      },
+    ],
+  },
+  B4: {
+    summary:
+      "For equally likely outcomes, the average is the balance point of the values, and expected counts are just probability times the number of trials.",
+    questions: [
+      {
+        title: "A four-sided die",
+        body: "What is the expected value of a fair four-sided die with faces 1, 2, 3, 4?",
+        answer: 2.5,
+        correct: "Yes. (1 + 2 + 3 + 4) / 4 = 2.5.",
+        incorrect: "Average the four equally likely faces.",
+        hint: "Add 1+2+3+4 and divide by 4.",
+        teach: "The average of equally likely faces is the midpoint of the values.",
+      },
+      {
+        title: "Counting sixes",
+        body: "If you roll a fair six-sided die 60 times, about how many 6s do you expect?",
+        options: ["10", "6", "60"],
+        answer: "10",
+        correct: "Right. 60 × (1/6) = 10.",
+        incorrect: "Expected count = probability × rolls.",
+        hint: "One sixth of 60.",
+        teach: "Expected count = probability of the outcome × number of trials.",
+      },
+    ],
+  },
+  B5: {
+    summary:
+      "Simulation is most useful when exact reasoning is hard. A wobbly estimate is a signal to run more trials, not to trust the wobble.",
+    questions: [
+      {
+        title: "Your estimate looks off",
+        body: "An estimate from only 10 trials looks wrong. What is the best next step?",
+        options: ["Run many more trials", "Trust it anyway", "Change the question"],
+        answer: "Run many more trials",
+        correct: "Right. More trials shrink the noise and steady the estimate.",
+        incorrect: "Small samples are noisy — add more trials before trusting them.",
+        hint: "More data, less noise.",
+        teach: "When a simulated estimate is unstable, the fix is almost always more trials.",
+      },
+      {
+        title: "When to simulate",
+        body: "Simulation is most valuable when...",
+        options: [
+          "The exact math is hard to see",
+          "You want one lucky result",
+          "You never check your guess",
+        ],
+        answer: "The exact math is hard to see",
+        correct: "Exactly. Simulation shines when direct calculation is awkward.",
+        incorrect: "Simulation is a tool for hard-to-compute problems, not luck.",
+        hint: "Use it when the formula is hard to find.",
+        teach: "Reach for simulation when exact counting or algebra is difficult.",
+      },
+    ],
+  },
+  L6: {
+    summary:
+      "Averaging many fair walks drives the running average toward the expected position of 0; adding bias shifts that target away from 0.",
+    questions: [
+      {
+        title: "Add a biased batch",
+        body: "If you mix in walks that take more +1 steps than -1, the running average will...",
+        options: ["Drift above 0", "Stay exactly at 0", "Drift below 0"],
+        answer: "Drift above 0",
+        correct: "Right. Extra +1 steps pull the average upward.",
+        incorrect: "More +1 steps raise the average position.",
+        hint: "Which direction do extra +1 steps push?",
+        teach: "The running average tracks the true expected position, so bias moves it off 0.",
+      },
+      {
+        title: "Fair expectation",
+        body: "For fair 5-step walks, what is the expected final position?",
+        answer: 0,
+        correct: "Yes. Fair steps cancel on average, so the expectation is 0.",
+        incorrect: "Fair +1/-1 steps average to 0.",
+        hint: "Equal up and down chances.",
+        teach: "Any fair walk has expected position 0, regardless of length.",
+      },
+    ],
+  },
+  L7: {
+    summary:
+      "Typical spread grows like sqrt(steps), so distance scales with the square root — quadruple the steps to double the spread.",
+    questions: [
+      {
+        title: "Spread at 900 steps",
+        body: "What is the typical spread of a fair 900-step walk?",
+        answer: 30,
+        correct: "Yes. sqrt(900) = 30.",
+        incorrect: "Take the square root of the number of steps.",
+        hint: "30 × 30 = 900.",
+        teach: "Typical distance ≈ sqrt(steps); this is the square-root law in action.",
+      },
+      {
+        title: "Doubling the spread",
+        body: "To make the typical spread twice as large, multiply the number of steps by...",
+        options: ["4", "2", "√2"],
+        answer: "4",
+        correct: "Right. Spread grows like sqrt(n), so 4× the steps doubles it.",
+        incorrect: "Because spread ~ sqrt(n), you need 4× steps for 2× spread.",
+        hint: "Undo a square root by squaring.",
+        teach: "Since spread scales with sqrt(n), doubling spread takes four times the steps.",
+      },
+    ],
+  },
+  M2: {
+    summary:
+      "In a two-state game chain, stickiness controls streak length, while each state's outgoing probabilities still must sum to 1.",
+    questions: [
+      {
+        title: "Less sticky wins",
+        body: "If Win→Win drops to 0.2, winning streaks become...",
+        options: ["Shorter", "Longer", "Unchanged"],
+        answer: "Shorter",
+        correct: "Right. A low self-transition makes the state leave quickly.",
+        incorrect: "Lower Win→Win means wins rarely repeat, so streaks shorten.",
+        hint: "Low stay-probability means short streaks.",
+        teach: "Self-transition probability sets streak length: lower means shorter streaks.",
+      },
+      {
+        title: "Rows sum to one",
+        body: "The probabilities leaving the Win state must add up to...",
+        options: ["1", "0", "2"],
+        answer: "1",
+        correct: "Right. Every state's outgoing probabilities sum to 1.",
+        incorrect: "Tomorrow must be some state, so they sum to 1.",
+        hint: "All outcomes from a state total 100%.",
+        teach: "Each state's transition probabilities always sum to 1.",
+      },
+    ],
+  },
+  M3: {
+    summary:
+      "Treating pages as states and links as transition probabilities turns browsing into a Markov chain — the idea behind PageRank.",
+    questions: [
+      {
+        title: "Model a link",
+        body: "When modeling a web surfer, each link between pages becomes a...",
+        options: ["Transition probability", "State", "Reward"],
+        answer: "Transition probability",
+        correct: "Right. Pages are states; links are the transitions between them.",
+        incorrect: "Pages are the states; the links are the transitions.",
+        hint: "What connects one state to the next?",
+        teach: "Pages are states and links define the transition probabilities between them.",
+      },
+      {
+        title: "What PageRank measures",
+        body: "PageRank ranks pages by...",
+        options: [
+          "How often a random surfer visits them",
+          "Alphabetical order",
+          "Page file size",
+        ],
+        answer: "How often a random surfer visits them",
+        correct: "Right. It is the long-run visit frequency of a random surfer.",
+        incorrect: "It measures long-run visit frequency, not name or size.",
+        hint: "Think long-run visits in the chain.",
+        teach: "PageRank is the stationary visit frequency of a random web surfer.",
+      },
+    ],
+  },
+  A3: {
+    summary:
+      "Gambler's ruin is boundary-hitting for a bankroll: fair and symmetric gives 50% ruin, but a far-away opponent boundary makes ruin almost certain.",
+    questions: [
+      {
+        title: "Versus the casino",
+        body: "Playing a fair game against a casino with vastly more money, your long-run chance of ruin is...",
+        options: ["Near certain", "About 50%", "Near zero"],
+        answer: "Near certain",
+        correct: "Right. Their boundary is effectively infinite, so you eventually bust.",
+        incorrect: "When the opponent's boundary is very far, ruin becomes nearly certain.",
+        hint: "Their wall is essentially infinitely far away.",
+        teach: "Against a much larger bankroll, even a fair game ruins you with near certainty.",
+      },
+      {
+        title: "Symmetric start",
+        body: "Fair game, start at 4 with boundaries 0 and 8. What is P(reach 8 before 0)?",
+        answer: 0.5,
+        correct: "Yes. Halfway between equal boundaries gives 1/2.",
+        incorrect: "You start exactly halfway, so it's symmetric.",
+        hint: "4 is the midpoint of 0 and 8.",
+        teach: "A fair walk starting at the midpoint hits either boundary with equal chance.",
+      },
+    ],
+  },
+  A4: {
+    summary:
+      "Rare events live in the tails and need many trials to observe; too few trials makes you underestimate their risk.",
+    questions: [
+      {
+        title: "Too few trials",
+        body: "A 1-in-1000 event, simulated only 50 times, will most often show up...",
+        options: ["Zero times", "Exactly once", "Hundreds of times"],
+        answer: "Zero times",
+        correct: "Right. 50 trials rarely catch a 1-in-1000 event at all.",
+        incorrect: "With only 50 trials you usually see it zero times.",
+        hint: "50 is tiny compared to 1000.",
+        teach: "Small samples usually miss rare events entirely, hiding their risk.",
+      },
+      {
+        title: "Why risk gets missed",
+        body: "Underestimating rare risk usually comes from...",
+        options: [
+          "Too few trials or too short a history",
+          "Too many trials",
+          "Using the complement rule",
+        ],
+        answer: "Too few trials or too short a history",
+        correct: "Right. Short samples simply never reveal the tail.",
+        incorrect: "Rare risk is missed when samples are too small or too short.",
+        hint: "Not enough data to see the tail.",
+        teach: "Tail risk is underestimated when the sample is too small to contain it.",
+      },
+    ],
+  },
+  A5: {
+    summary:
+      "A stationary distribution is set by the transition probabilities and describes the long-run mix of states, not the starting point.",
+    questions: [
+      {
+        title: "What sets equilibrium",
+        body: "The stationary distribution depends mainly on...",
+        options: [
+          "The transition probabilities",
+          "The starting state",
+          "The first day only",
+        ],
+        answer: "The transition probabilities",
+        correct: "Right. Long-run behavior is governed by the transitions, not the start.",
+        incorrect: "Equilibrium is determined by the transition probabilities.",
+        hint: "What rule drives every step?",
+        teach: "The long-run mix is fixed by the transition probabilities, not where you began.",
+      },
+      {
+        title: "Long-run count",
+        body: "If the long-run sunny share is 70%, how many sunny days do you expect in 30?",
+        answer: 21,
+        correct: "Yes. 0.70 × 30 = 21.",
+        incorrect: "Multiply the long-run share by the number of days.",
+        hint: "70% of 30.",
+        teach: "Expected count from a long-run share = share × number of days.",
+      },
+    ],
+  },
+  B6: {
+    summary:
+      "Net displacement equals up-moves minus down-moves; combined with the move count, it fixes exactly how many of each you need.",
+    questions: [
+      {
+        title: "Count the up-moves",
+        body: "With 6 moves starting at 0 to end at +2, how many +1 moves are needed?",
+        answer: 4,
+        correct: "Yes. up − down = 2 and up + down = 6, so up = 4.",
+        incorrect: "Solve up − down = 2 with up + down = 6.",
+        hint: "Add the two equations.",
+        teach: "Up-moves = (total moves + net displacement) / 2.",
+      },
+      {
+        title: "Same destination",
+        body: "Two different 6-move paths both end at +2. They must share the same...",
+        options: ["Net displacement", "Exact order of moves", "Maximum height"],
+        answer: "Net displacement",
+        correct: "Right. Same endpoint means same net displacement, even if the order differs.",
+        incorrect: "Endpoint depends on net displacement, not the order.",
+        hint: "Order can differ; the total cannot.",
+        teach: "Many move orders share one net displacement — that's why paths can differ yet end together.",
+      },
+    ],
+  },
+  B7: {
+    summary:
+      "Comparing noisy strategies needs many trials; averaging makes the true difference reliable instead of luck-driven.",
+    questions: [
+      {
+        title: "One win proves little",
+        body: "Strategy A beats B in a single run. You should...",
+        options: ["Run many more trials", "Declare A better", "Stop testing"],
+        answer: "Run many more trials",
+        correct: "Right. One run is luck; many runs reveal the real winner.",
+        incorrect: "A single run is too noisy to decide.",
+        hint: "Don't trust one noisy result.",
+        teach: "Fair comparisons average many trials, not a single outcome.",
+      },
+      {
+        title: "Effect of averaging",
+        body: "Averaging more trials makes a strategy comparison...",
+        options: ["More reliable", "Noisier", "Impossible"],
+        answer: "More reliable",
+        correct: "Right. More trials cancel noise and sharpen the comparison.",
+        incorrect: "More trials reduce noise, improving reliability.",
+        hint: "More data, clearer signal.",
+        teach: "Larger samples shrink noise, making comparisons trustworthy.",
+      },
+    ],
+  },
+  B8: {
+    summary:
+      "The beginner toolkit — complements, equally-likely counting, and expected value — all start by modeling the possible outcomes.",
+    questions: [
+      {
+        title: "Complement on a die",
+        body: "What is the probability of NOT rolling a 1 on a fair six-sided die?",
+        options: ["5/6", "1/6", "1"],
+        answer: "5/6",
+        correct: "Right. Five of six faces are not a 1.",
+        incorrect: "Use 1 − P(roll a 1).",
+        hint: "1 − 1/6.",
+        teach: "Complement rule: P(not A) = 1 − P(A).",
+      },
+      {
+        title: "Expected payout",
+        body: "A coin pays 10 for Heads and 0 for Tails. What is the expected payout?",
+        answer: 5,
+        correct: "Yes. (1/2)(10) + (1/2)(0) = 5.",
+        incorrect: "Weight each payout by its 1/2 chance.",
+        hint: "Half of 10.",
+        teach: "Expected value weights each payout by its probability and sums.",
+      },
+    ],
+  },
+  L8: {
+    summary:
+      "Designing a walk is about controlling net displacement, and parity limits which endpoints a given number of moves can reach.",
+    questions: [
+      {
+        title: "Up-moves for +1",
+        body: "With 5 moves starting at 0 to end at +1, how many +1 moves are needed?",
+        answer: 3,
+        correct: "Yes. up − down = 1 and up + down = 5, so up = 3.",
+        incorrect: "Solve up − down = 1 with up + down = 5.",
+        hint: "Add the two equations.",
+        teach: "Up-moves = (total moves + net displacement) / 2.",
+      },
+      {
+        title: "A parity limit",
+        body: "Why can't 5 moves end exactly at +2?",
+        options: [
+          "Parity: 5 moves can't produce an even displacement",
+          "There are too few moves",
+          "+2 is out of range",
+        ],
+        answer: "Parity: 5 moves can't produce an even displacement",
+        correct: "Right. An odd number of ±1 moves always lands on an odd position.",
+        incorrect: "Odd move counts can only reach odd endpoints.",
+        hint: "Odd number of steps → odd endpoint.",
+        teach: "Parity: the endpoint's evenness matches the number of moves.",
+      },
+    ],
+  },
+  L9: {
+    summary:
+      "The running average estimates per-step drift directly: its sign tells direction, and drift times steps gives expected position.",
+    questions: [
+      {
+        title: "Read the drift",
+        body: "If the running average settles near -0.2 per step, the walk has...",
+        options: ["Negative drift", "Positive drift", "No drift"],
+        answer: "Negative drift",
+        correct: "Right. A negative per-step average means downward drift.",
+        incorrect: "A negative average per step is negative drift.",
+        hint: "Negative average → which direction?",
+        teach: "The sign of the per-step average is the sign of the drift.",
+      },
+      {
+        title: "Drift to position",
+        body: "With per-step drift 0.1 over 50 steps, what is the expected position?",
+        answer: 5,
+        correct: "Yes. 0.1 × 50 = 5.",
+        incorrect: "Expected position = per-step drift × steps.",
+        hint: "0.1 times 50.",
+        teach: "Expected position = per-step drift × number of steps.",
+      },
+    ],
+  },
+  M4: {
+    summary:
+      "A Markov process is a whole sequence of states; the intermediate states carry information a single endpoint would hide.",
+    questions: [
+      {
+        title: "Where plans differ",
+        body: "Two plans share the same start and end but differ in...",
+        options: ["The middle states", "The number of states", "Nothing"],
+        answer: "The middle states",
+        correct: "Right. The path between endpoints is what changes.",
+        incorrect: "Same endpoints can still differ in the middle.",
+        hint: "Look between start and end.",
+        teach: "Intermediate states distinguish paths with the same endpoints.",
+      },
+      {
+        title: "A chain is a...",
+        body: "A Markov chain's behavior is best described as...",
+        options: ["A sequence of states", "A single endpoint", "A fixed number"],
+        answer: "A sequence of states",
+        correct: "Right. The chain is the whole trajectory, step by step.",
+        incorrect: "A chain is a sequence, not one number.",
+        hint: "It's a path, not a point.",
+        teach: "A Markov chain is a sequence of states over time, not a single outcome.",
+      },
+    ],
+  },
+  A6: {
+    summary:
+      "Ruin risk responds to capital and edge: a negative edge dooms you over time, and more starting capital is the main safety lever.",
+    questions: [
+      {
+        title: "A negative edge",
+        body: "With a negative per-bet edge, long-run ruin is...",
+        options: ["Increasingly likely", "Avoidable with patience", "Impossible"],
+        answer: "Increasingly likely",
+        correct: "Right. A negative edge compounds into near-certain ruin.",
+        incorrect: "A losing edge makes ruin more likely the longer you play.",
+        hint: "Small disadvantages compound.",
+        teach: "A negative edge repeated many times drives ruin toward certainty.",
+      },
+      {
+        title: "Best safety lever",
+        body: "In a fair-ish game, the biggest lever to cut ruin risk is...",
+        options: ["More starting capital", "Betting faster", "Playing longer"],
+        answer: "More starting capital",
+        correct: "Right. A bigger buffer pushes the ruin boundary away.",
+        incorrect: "More capital moves the ruin wall farther off.",
+        hint: "Think about the size of your buffer.",
+        teach: "More starting capital is the primary way to reduce risk of ruin.",
+      },
+    ],
+  },
+  A7: {
+    summary:
+      "Tail events are rare, far-from-center outcomes; seeing them clearly requires many trials.",
+    questions: [
+      {
+        title: "Define a tail event",
+        body: "Tail events are...",
+        options: [
+          "Rare, far from the center",
+          "Common, near the center",
+          "The average outcome",
+        ],
+        answer: "Rare, far from the center",
+        correct: "Right. Tails are the uncommon extremes of a distribution.",
+        incorrect: "Tails sit at the far edges, not the middle.",
+        hint: "Edges of the histogram.",
+        teach: "Tail events are the rare extreme outcomes at a distribution's edges.",
+      },
+      {
+        title: "Seeing the tail",
+        body: "To observe a tail event clearly, you need...",
+        options: ["Many trials", "A few trials", "One trial"],
+        answer: "Many trials",
+        correct: "Right. Rare outcomes only appear with enough trials.",
+        incorrect: "Rare events require large samples to show up.",
+        hint: "Rare needs lots of attempts.",
+        teach: "Rare outcomes need large samples before they appear reliably.",
+      },
+    ],
+  },
+  A8: {
+    summary:
+      "An absorbing boundary stops the process; reaching one is a matter of net displacement and the step budget.",
+    questions: [
+      {
+        title: "Absorbing boundary",
+        body: "An absorbing boundary is a state where the process...",
+        options: ["Stops", "Speeds up", "Resets randomly"],
+        answer: "Stops",
+        correct: "Right. Once absorbed, the walk ends there.",
+        incorrect: "Absorbing means the process halts on arrival.",
+        hint: "Absorbed = finished.",
+        teach: "At an absorbing boundary the process stops for good.",
+      },
+      {
+        title: "Steps to the wall",
+        body: "Starting at 3, how many +1 steps reach the boundary at 7?",
+        answer: 4,
+        correct: "Yes. 7 − 3 = 4 upward steps.",
+        incorrect: "Subtract the start from the boundary.",
+        hint: "7 minus 3.",
+        teach: "Minimum steps to a boundary is the distance to it.",
+      },
+    ],
+  },
+  A9: {
+    summary:
+      "The capstone idea: use simulation as a bridge to intuition, connecting a distribution's center and spread to exact reasoning.",
+    questions: [
+      {
+        title: "Best use of simulation",
+        body: "For hard problems, the best overall use of simulation is to...",
+        options: [
+          "Bridge intuition and calculation",
+          "Replace all math",
+          "Avoid thinking",
+        ],
+        answer: "Bridge intuition and calculation",
+        correct: "Right. Simulate to build intuition, then confirm with math.",
+        incorrect: "Simulation supports reasoning; it doesn't replace it.",
+        hint: "It connects, not replaces.",
+        teach: "Simulation is a bridge between intuition and exact calculation.",
+      },
+      {
+        title: "The recurring pair",
+        body: "Which pair of ideas did this course keep connecting?",
+        options: ["Center and spread", "Color and shape", "Speed and price"],
+        answer: "Center and spread",
+        correct: "Right. Center (average) and spread (uncertainty) ran through everything.",
+        incorrect: "The recurring pair was center and spread.",
+        hint: "Average versus how much it scatters.",
+        teach: "Center and spread — average and uncertainty — are the two recurring lenses.",
+      },
+    ],
+  },
+};
+
+function buildFollowupStep(
+  spec: { id: string },
+  order: 3 | 4,
+  followup: Followup
+): LessonStep {
+  const isNumeric = typeof followup.answer === "number";
+  return {
+    id: `${spec.id}-S${order}`,
+    lessonId: spec.id,
+    order,
+    type: isNumeric ? "input" : "choice",
+    title: followup.title,
+    body: followup.body,
+    interaction: {
+      widget: isNumeric ? "number-input" : "choice-input",
+      params: isNumeric
+        ? { label: "Your answer" }
+        : { options: followup.options ?? [] },
+      validation: isNumeric
+        ? { type: "exact", expected: followup.answer, tolerance: 0.01 }
+        : { type: "choice", expected: followup.answer },
+    },
+    feedback: {
+      correct: followup.correct,
+      incorrect: followup.incorrect,
+      hint: followup.hint,
+    },
+    teach: followup.teach,
+  };
+}
+
 const extraLessons: Lesson[] = extraLessonSpecs.map((spec) => ({
   id: spec.id,
   courseId: spec.courseId,
@@ -440,61 +1031,15 @@ function makeExtraSteps(): LessonStep[] {
         teach:
           "When the simulated trend and the calculated value agree, you can trust the result. That agreement is the goal of every problem here: the picture and the formula should tell the same story, and each one makes the other easier to remember.",
       },
-      {
-        id: `${spec.id}-S3`,
-        lessonId: spec.id,
-        order: 3,
-        type: "choice",
-        title: "Noise versus signal",
-        body: "Why can a short simulation still disagree with the expected pattern?",
-        interaction: {
-          widget: "choice-input",
-          params: {
-            options: [
-              "Random samples are noisy",
-              "Expected value stops working",
-              "The probabilities disappear",
-            ],
-          },
-          validation: { type: "choice", expected: "Random samples are noisy" },
-        },
-        feedback: {
-          correct: "Exactly. Short runs can be misleading; repeated runs reveal the pattern.",
-          incorrect: "Expected patterns are long-run ideas, so small samples can wiggle.",
-          hint: "Think about why a coin can have short streaks.",
-        },
-        teach:
-          "Randomness is lumpy at small scale. A fair coin can give five heads in a row; a few simulation runs can land far from the expected value. Expected value describes the long run, so always judge it from many trials, not a handful.",
-      },
-      {
-        id: `${spec.id}-S4`,
-        lessonId: spec.id,
-        order: 4,
-        type: "choice",
-        title: "What should you trust?",
-        body: "When one trial and a thousand trials disagree, which is usually more informative?",
-        interaction: {
-          widget: "choice-input",
-          params: {
-            options: ["One trial", "A thousand trials", "Neither ever helps"],
-          },
-          validation: { type: "choice", expected: "A thousand trials" },
-        },
-        feedback: {
-          correct: "Right. More trials usually reduce the noise in your estimate.",
-          incorrect: "One trial can be interesting, but it is too noisy to summarize the system.",
-          hint: "Large samples average out more randomness.",
-        },
-        teach:
-          "This is the Law of Large Numbers: as you average more independent trials, the estimate homes in on the true value, with error shrinking like 1/sqrt(number of trials). It's why big samples beat single anecdotes everywhere — polls, experiments, and trading alike.",
-      },
+      buildFollowupStep(spec, 3, extraFollowups[spec.id].questions[0]),
+      buildFollowupStep(spec, 4, extraFollowups[spec.id].questions[1]),
       {
         id: `${spec.id}-S5`,
         lessonId: spec.id,
         order: 5,
         type: "explain",
         title: "Lesson checkpoint",
-        body: "The habit is: predict, simulate, compare, then refine. This makes harder probability questions feel less abstract.",
+        body: extraFollowups[spec.id].summary,
         interaction: {
           widget: "none",
           validation: { type: "completion" },
