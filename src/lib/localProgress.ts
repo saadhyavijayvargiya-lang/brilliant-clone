@@ -1,6 +1,14 @@
 import type { AppProgress, LessonProgress, LessonStatus } from "../types/content";
 
-const STORAGE_KEY = "pathwise-progress";
+const STORAGE_PREFIX = "pathwise-progress";
+
+// Progress is namespaced per account so switching users never shows another
+// account's local data. "guest" is used when no one is signed in.
+let activeStorageKey = `${STORAGE_PREFIX}:guest`;
+
+export function setActiveAccount(uid: string | null): void {
+  activeStorageKey = `${STORAGE_PREFIX}:${uid ?? "guest"}`;
+}
 
 export function defaultProgress(): AppProgress {
   return {
@@ -57,7 +65,7 @@ export function setDisplayName(
 
 export function loadProgress(): AppProgress {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(activeStorageKey);
     if (!raw) return defaultProgress();
     return { ...defaultProgress(), ...JSON.parse(raw) } as AppProgress;
   } catch {
@@ -66,7 +74,7 @@ export function loadProgress(): AppProgress {
 }
 
 export function saveProgress(progress: AppProgress): void {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  window.localStorage.setItem(activeStorageKey, JSON.stringify(progress));
 }
 
 export function getLessonProgress(

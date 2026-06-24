@@ -25,14 +25,24 @@ export default function App() {
     updateDisplayName,
     updateProfileBackground,
     updateAvatar,
+    switchAccount,
   } =
     useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
-  const hydratedUserRef = useRef<string | null>(null);
+  const hydratedUserRef = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
-    if (!user || hydratedUserRef.current === user.uid) return;
-    hydratedUserRef.current = user.uid;
+    if (loading) return;
+    const accountId = user?.uid ?? null;
+    if (hydratedUserRef.current === accountId) return;
+    hydratedUserRef.current = accountId;
+
+    // Load the local progress that belongs to THIS account (or guest), so a
+    // previous account's data never leaks across a sign-in/sign-out.
+    switchAccount(accountId);
+
+    if (!user) return;
+
     loadRemoteProgress(user)
       .then((remoteProgress) => {
         if (remoteProgress) {
@@ -46,7 +56,7 @@ export default function App() {
       .catch((err: unknown) => {
         setSyncMessage(getSyncError(err));
       });
-  }, [replaceProgress, user]);
+  }, [loading, replaceProgress, switchAccount, updateDisplayName, user]);
 
   useEffect(() => {
     if (!user || loading) return;
