@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AppProgress } from "../types/content";
 import {
+  defaultProgress,
   loadProgress,
   markIncorrect,
   markStepComplete,
@@ -9,6 +10,7 @@ import {
   setAvatar,
   setCurrentStep,
   setDisplayName,
+  setLocalPersistence,
   setProfileBackground,
 } from "../lib/localProgress";
 
@@ -58,7 +60,16 @@ export function useLocalProgress() {
 
   const switchAccount = useCallback((uid: string | null) => {
     setActiveAccount(uid);
-    setProgressState(loadProgress());
+    if (uid) {
+      // Signed in: Firestore is the only store. Start clean and let the remote
+      // load fill it in, so a previous account's data can never show.
+      setLocalPersistence(false);
+      setProgressState(defaultProgress());
+    } else {
+      // Guest: keep a local cache so the app still works without an account.
+      setLocalPersistence(true);
+      setProgressState(loadProgress());
+    }
   }, []);
 
   return {

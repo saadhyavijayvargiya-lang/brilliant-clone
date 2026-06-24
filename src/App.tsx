@@ -30,15 +30,18 @@ export default function App() {
     useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const hydratedUserRef = useRef<string | null | undefined>(undefined);
+  // Becomes true only after the signed-in account's Firestore data has loaded,
+  // so we never overwrite remote progress with a freshly-reset default.
+  const remoteReadyRef = useRef(false);
 
   useEffect(() => {
     if (loading) return;
     const accountId = user?.uid ?? null;
     if (hydratedUserRef.current === accountId) return;
     hydratedUserRef.current = accountId;
+    remoteReadyRef.current = false;
 
-    // Load the local progress that belongs to THIS account (or guest), so a
-    // previous account's data never leaks across a sign-in/sign-out.
+    // Reset to this account's clean slate (or guest cache) before loading.
     switchAccount(accountId);
 
     if (!user) return;
@@ -55,11 +58,14 @@ export default function App() {
       })
       .catch((err: unknown) => {
         setSyncMessage(getSyncError(err));
+      })
+      .finally(() => {
+        remoteReadyRef.current = true;
       });
   }, [loading, replaceProgress, switchAccount, updateDisplayName, user]);
 
   useEffect(() => {
-    if (!user || loading) return;
+    if (!user || loading || !remoteReadyRef.current) return;
     const timeout = window.setTimeout(() => {
       saveRemoteProgress(user, progress).catch((err: unknown) => {
         setSyncMessage(getSyncError(err));

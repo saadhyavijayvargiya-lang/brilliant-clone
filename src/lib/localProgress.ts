@@ -6,8 +6,16 @@ const STORAGE_PREFIX = "pathwise-progress";
 // account's local data. "guest" is used when no one is signed in.
 let activeStorageKey = `${STORAGE_PREFIX}:guest`;
 
+// When signed in we rely on Firestore as the only store, so local persistence
+// is disabled to avoid any cross-account leakage from the browser cache.
+let localPersistenceEnabled = true;
+
 export function setActiveAccount(uid: string | null): void {
   activeStorageKey = `${STORAGE_PREFIX}:${uid ?? "guest"}`;
+}
+
+export function setLocalPersistence(enabled: boolean): void {
+  localPersistenceEnabled = enabled;
 }
 
 export function defaultProgress(): AppProgress {
@@ -74,6 +82,7 @@ export function loadProgress(): AppProgress {
 }
 
 export function saveProgress(progress: AppProgress): void {
+  if (!localPersistenceEnabled) return;
   window.localStorage.setItem(activeStorageKey, JSON.stringify(progress));
 }
 
