@@ -2018,8 +2018,27 @@ a {
 .sample-avatar {
   width: 4rem;
   height: 4rem;
-  border: 0;
+  border: 2px solid transparent;
   font-size: 1.6rem;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.sample-avatar:hover {
+  transform: translateY(-2px);
+}
+
+.sample-avatar-active {
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 3px rgba(0, 206, 201, 0.45), 0 0 30px rgba(0, 206, 201, 0.35);
+}
+
+.orb-avatar {
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 .profile-course-list {
@@ -2114,6 +2133,13 @@ a {
 
 .lesson-controls,
 .completion-card {
+  margin-top: 1rem;
+}
+
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 

@@ -82,6 +82,7 @@ export interface AppProgress {
   displayName: string;
   hasCustomDisplayName: boolean;
   profileBackground: string;
+  avatar: string;
   streakCount: number;
   lastActiveDate: string | null;
   activeDates: string[];

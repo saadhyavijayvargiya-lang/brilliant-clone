@@ -1,6 +1,10 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { StepRenderer } from "../components/StepRenderer";
-import { getLesson, getLessonSteps } from "../content/course";
+import {
+  getLesson,
+  getLessonSteps,
+  getLessonsForCourse,
+} from "../content/course";
 import { getLessonProgress, getLessonStatus } from "../lib/localProgress";
 import type { AppProgress } from "../types/content";
 
@@ -62,6 +66,11 @@ export function LessonPage({
   const step = steps[stepIndex];
   const isStepComplete = lessonProgress.completedStepIds.includes(step.id);
   const lessonComplete = progress.completedLessons.includes(lesson.id);
+  const courseLessons = getLessonsForCourse(lesson.courseId);
+  const lessonIndex = courseLessons.findIndex((item) => item.id === lesson.id);
+  const nextLesson = courseLessons
+    .slice(lessonIndex + 1)
+    .find((item) => item.stepIds.length > 0);
 
   return (
     <main className="page lesson-layout">
@@ -132,12 +141,24 @@ export function LessonPage({
           <div className="completion-card">
             <h2>Lesson complete</h2>
             <p>
-              Nice work. Head back to the path to unlock the next lesson and keep
-              your streak going.
+              Nice work. {nextLesson
+                ? `Up next: ${nextLesson.title}.`
+                : "You finished the last lesson in this course."}{" "}
+              Keep your streak going.
             </p>
-            <Link className="button" to={`/course/${lesson.courseId}`}>
-              View course path
-            </Link>
+            <div className="completion-actions">
+              {nextLesson ? (
+                <Link className="button" to={`/lesson/${nextLesson.id}`}>
+                  Start next lesson
+                </Link>
+              ) : null}
+              <Link
+                className={`button ${nextLesson ? "button-secondary" : ""}`}
+                to={`/course/${lesson.courseId}`}
+              >
+                View course path
+              </Link>
+            </div>
           </div>
         ) : null}
       </div>

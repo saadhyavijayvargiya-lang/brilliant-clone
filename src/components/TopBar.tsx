@@ -70,6 +70,8 @@ export function TopBar({ progress, user, onSignOut }: TopBarProps) {
       <NavLink className="profile-orb-link" to="/profile" aria-label="Profile">
         {user?.photoURL ? (
           <img src={user.photoURL} alt="" />
+        ) : progress.avatar ? (
+          <span className="orb-avatar">{progress.avatar}</span>
         ) : (
           <span>{(user?.displayName ?? progress.displayName ?? "L")[0]}</span>
         )}

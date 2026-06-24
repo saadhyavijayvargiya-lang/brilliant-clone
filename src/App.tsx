@@ -24,6 +24,7 @@ export default function App() {
     replaceProgress,
     updateDisplayName,
     updateProfileBackground,
+    updateAvatar,
   } =
     useLocalProgress();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
@@ -92,6 +93,7 @@ export default function App() {
               progress={progress}
               onDisplayNameChange={(name) => updateDisplayName(name, true)}
               onBackgroundChange={updateProfileBackground}
+              onAvatarChange={updateAvatar}
             />
           }
         />

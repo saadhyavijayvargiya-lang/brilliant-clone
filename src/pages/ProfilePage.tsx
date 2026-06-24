@@ -8,7 +8,10 @@ interface ProfilePageProps {
   progress: AppProgress;
   onDisplayNameChange: (displayName: string) => void;
   onBackgroundChange: (background: string) => void;
+  onAvatarChange: (avatar: string) => void;
 }
+
+const avatarOptions = ["🪐", "🌙", "☄", "✦", "∞", "🛰", "⭐", "🌌"];
 
 const backgroundOptions = [
   {
@@ -37,6 +40,7 @@ export function ProfilePage({
   progress,
   onDisplayNameChange,
   onBackgroundChange,
+  onAvatarChange,
 }: ProfilePageProps) {
   const [draftName, setDraftName] = useState(progress.displayName);
 
@@ -74,7 +78,7 @@ export function ProfilePage({
     <main className="page profile-page">
       <section className={`panel profile-hero profile-bg-${progress.profileBackground ?? "nebula"}`}>
         <div className="profile-avatar-ring">
-          <span>{progress.displayName[0] ?? "L"}</span>
+          <span>{progress.avatar || progress.displayName[0] || "L"}</span>
         </div>
         <div>
           <div className="eyebrow">Profile</div>
@@ -128,12 +132,19 @@ export function ProfilePage({
 
       <section className="panel">
         <div className="subject-heading">
-          <h2>Sample profile icons</h2>
-          <span>pick a vibe later</span>
+          <h2>Profile icon</h2>
+          <span>tap to choose yours</span>
         </div>
-        <div className="avatar-row" aria-label="Sample profile icons">
-          {["🪐", "🌙", "☄", "✦", "∞"].map((avatar) => (
-            <button className="sample-avatar" key={avatar}>
+        <div className="avatar-row" aria-label="Profile icons">
+          {avatarOptions.map((avatar) => (
+            <button
+              className={`sample-avatar ${
+                progress.avatar === avatar ? "sample-avatar-active" : ""
+              }`}
+              key={avatar}
+              onClick={() => onAvatarChange(avatar)}
+              aria-pressed={progress.avatar === avatar}
+            >
               {avatar}
             </button>
           ))}

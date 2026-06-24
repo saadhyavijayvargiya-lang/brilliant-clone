@@ -7,6 +7,7 @@ export function defaultProgress(): AppProgress {
     displayName: "Learner",
     hasCustomDisplayName: false,
     profileBackground: "nebula",
+    avatar: "🪐",
     streakCount: 0,
     lastActiveDate: null,
     activeDates: [],
@@ -25,6 +26,15 @@ export function setProfileBackground(
   const nextProgress = {
     ...progress,
     profileBackground,
+  };
+  saveProgress(nextProgress);
+  return nextProgress;
+}
+
+export function setAvatar(progress: AppProgress, avatar: string): AppProgress {
+  const nextProgress = {
+    ...progress,
+    avatar,
   };
   saveProgress(nextProgress);
   return nextProgress;

@@ -5,6 +5,7 @@ import {
   markIncorrect,
   markStepComplete,
   saveProgress,
+  setAvatar,
   setCurrentStep,
   setDisplayName,
   setProfileBackground,
@@ -50,6 +51,10 @@ export function useLocalProgress() {
     setProgressState((current) => setProfileBackground(current, profileBackground));
   }, []);
 
+  const updateAvatar = useCallback((avatar: string) => {
+    setProgressState((current) => setAvatar(current, avatar));
+  }, []);
+
   return {
     progress,
     completeStep,
@@ -58,5 +63,6 @@ export function useLocalProgress() {
     replaceProgress,
     updateDisplayName,
     updateProfileBackground,
+    updateAvatar,
   };
 }
