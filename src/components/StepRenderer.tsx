@@ -8,6 +8,8 @@ import { RandomWalkSim } from "../widgets/RandomWalkSim";
 import { RunningAverageSim } from "../widgets/RunningAverageSim";
 import { GamblerRuinSim } from "../widgets/GamblerRuinSim";
 import { TargetPathSim } from "../widgets/TargetPathSim";
+import { GaltonBoardSim } from "../widgets/GaltonBoardSim";
+import { SpinnerSim } from "../widgets/SpinnerSim";
 
 interface StepRendererProps {
   step: LessonStep;
@@ -145,6 +147,26 @@ export function StepRenderer({
             start={Number(params.start ?? 0)}
             target={Number(params.target ?? 3)}
             moves={Number(params.moves ?? 5)}
+            onComplete={markComplete}
+          />
+        );
+
+      case "galton-board-sim":
+        return (
+          <GaltonBoardSim
+            rows={Number(params.rows ?? 8)}
+            onComplete={markComplete}
+          />
+        );
+
+      case "spinner-sim":
+        return (
+          <SpinnerSim
+            segments={
+              Array.isArray(params.segments)
+                ? (params.segments as string[])
+                : undefined
+            }
             onComplete={markComplete}
           />
         );

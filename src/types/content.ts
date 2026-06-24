@@ -9,6 +9,8 @@ export type WidgetType =
   | "running-average-sim"
   | "gambler-ruin-sim"
   | "target-path-sim"
+  | "galton-board-sim"
+  | "spinner-sim"
   | "choice-input"
   | "number-input";
 
