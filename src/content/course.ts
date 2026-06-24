@@ -407,6 +407,8 @@ function makeExtraSteps(): LessonStep[] {
           incorrect: "Run the simulation at least once.",
           hint: "Press the run button and watch the average or path update.",
         },
+        teach:
+          "Before you calculate anything, a simulation gives you a ballpark answer to sanity-check against. Watch where the numbers settle — that stable value is usually what the exact math will confirm in the next step.",
       },
       {
         id: `${spec.id}-S2`,
@@ -435,6 +437,8 @@ function makeExtraSteps(): LessonStep[] {
           incorrect: "Not quite. Use the simulation trend, not one noisy result.",
           hint: "Look for the value or phrase that describes repeated-trial behavior.",
         },
+        teach:
+          "When the simulated trend and the calculated value agree, you can trust the result. That agreement is the goal of every problem here: the picture and the formula should tell the same story, and each one makes the other easier to remember.",
       },
       {
         id: `${spec.id}-S3`,
@@ -459,6 +463,8 @@ function makeExtraSteps(): LessonStep[] {
           incorrect: "Expected patterns are long-run ideas, so small samples can wiggle.",
           hint: "Think about why a coin can have short streaks.",
         },
+        teach:
+          "Randomness is lumpy at small scale. A fair coin can give five heads in a row; a few simulation runs can land far from the expected value. Expected value describes the long run, so always judge it from many trials, not a handful.",
       },
       {
         id: `${spec.id}-S4`,
@@ -479,6 +485,8 @@ function makeExtraSteps(): LessonStep[] {
           incorrect: "One trial can be interesting, but it is too noisy to summarize the system.",
           hint: "Large samples average out more randomness.",
         },
+        teach:
+          "This is the Law of Large Numbers: as you average more independent trials, the estimate homes in on the true value, with error shrinking like 1/sqrt(number of trials). It's why big samples beat single anecdotes everywhere — polls, experiments, and trading alike.",
       },
       {
         id: `${spec.id}-S5`,
@@ -673,6 +681,8 @@ export const steps: LessonStep[] = [
       incorrect: "Keep stepping until the path has 10 coin-flip moves.",
       hint: "Use the Heads and Tails buttons until the counter reaches 10.",
     },
+    teach:
+      "Your position is just the running sum of the steps: each Heads adds 1, each Tails subtracts 1. Keep that 'position = sum of steps' idea in mind — the next questions ask about the average and spread of exactly this number.",
   },
   {
     id: "L1-S2",
@@ -691,6 +701,8 @@ export const steps: LessonStep[] = [
       incorrect: "Not quite. In a fair walk, right and left steps are equally likely.",
       hint: "If Heads and Tails are equally likely, neither side should win on average.",
     },
+    teach:
+      "Expected value is an average over many repeats, not a prediction for one walk. Because each fair step averages to 0, the expected position is 0 for any number of steps — a fact you'll reuse when we add bias and the average stops being 0.",
   },
   {
     id: "L1-S3",
@@ -709,6 +721,8 @@ export const steps: LessonStep[] = [
       incorrect: "The walker can wander far, but the center of all fair outcomes is still 0.",
       hint: "Ask where the histogram would be centered after many repeated fair walks.",
     },
+    teach:
+      "Separate two ideas: the center (where outcomes balance) versus the spread (how far they scatter). Fair walks keep the center at 0 while the spread grows with more steps. The next lesson makes that spread visible with a histogram.",
   },
   {
     id: "L1-S4",
@@ -727,6 +741,8 @@ export const steps: LessonStep[] = [
       incorrect: "Count right steps as +1 and left steps as -1, then add them.",
       hint: "There are five +1 steps and three -1 steps.",
     },
+    teach:
+      "Net displacement = (up steps) − (down steps). This shortcut — you only need the counts, not the order — is the seed of counting how many paths reach a given endpoint, which you'll use in the design-a-walk lessons.",
   },
   {
     id: "L1-S5",
@@ -751,6 +767,8 @@ export const steps: LessonStep[] = [
       incorrect: "A steady trend usually means bias. Fair walks are centered but noisy.",
       hint: "Fair means right and left are equally likely.",
     },
+    teach:
+      "A steady lean in one direction is called drift, and it only appears when the coin is biased. Spotting 'centered but noisy' versus 'trending' by eye is the exact skill the Drift and Bias lesson formalizes.",
   },
   {
     id: "L1-S6",
@@ -785,6 +803,8 @@ export const steps: LessonStep[] = [
       incorrect: "Run the trials at least once to reveal the distribution.",
       hint: "Press Run trials after choosing a step count.",
     },
+    teach:
+      "A histogram turns thousands of noisy walks into one stable shape: tall bars are common endings, short bars are rare ones. That shape is a distribution — the object the rest of this lesson asks questions about.",
   },
   {
     id: "L2-S2",
@@ -803,6 +823,8 @@ export const steps: LessonStep[] = [
       incorrect: "The center stays at 0, but the spread grows as the number of steps grows.",
       hint: "Think about how many chances the walker gets to move away from the origin.",
     },
+    teach:
+      "More steps means more spread, but not proportionally — the typical distance grows like sqrt(n). The very next question pins down that square-root rule with a number.",
   },
   {
     id: "L2-S3",
@@ -821,6 +843,8 @@ export const steps: LessonStep[] = [
       incorrect: "The key number is the square root of the number of steps.",
       hint: "10 × 10 = 100.",
     },
+    teach:
+      "The square-root law is worth memorizing: typical distance ≈ sqrt(steps). Quadrupling the steps only doubles the spread. This same 1/sqrt(n) behavior controls polling error and measurement noise everywhere.",
   },
   {
     id: "L2-S4",
@@ -848,6 +872,8 @@ export const steps: LessonStep[] = [
       incorrect: "Fairness keeps the center near 0. More steps mainly increase spread.",
       hint: "Separate average position from how far individual paths wander.",
     },
+    teach:
+      "Always track center and spread separately — they answer different questions. Center says 'where on average,' spread says 'how uncertain.' In the next lesson, bias will move the center while spread keeps behaving like sqrt(n).",
   },
   {
     id: "L2-S5",
@@ -891,6 +917,8 @@ export const steps: LessonStep[] = [
       incorrect: "A histogram counts outcomes. Taller means more repeated walks landed there.",
       hint: "Think of each trial as one vote for its final position.",
     },
+    teach:
+      "Relative bar heights estimate probabilities: divide a bar's count by the total trials to approximate the chance of landing there. This 'count and divide' move is how simulation answers probability questions you can't easily compute by hand.",
   },
   {
     id: "L2-S7",
@@ -925,6 +953,8 @@ export const steps: LessonStep[] = [
       incorrect: "Move the bias slider and run the paths.",
       hint: "Try p = 0.65 and compare it to p = 0.5.",
     },
+    teach:
+      "Bias is the probability p of a +1 step. The cloud of paths still spreads, but now its center marches in a direction. The upcoming questions turn that visual drift into the exact formula n(2p − 1).",
   },
   {
     id: "L3-S2",
@@ -943,6 +973,8 @@ export const steps: LessonStep[] = [
       incorrect: "p(+1) is greater than 0.5, so positive steps win on average.",
       hint: "The +1 direction is favored.",
     },
+    teach:
+      "Drift direction follows the sign of 2p − 1: positive when p > 0.5, negative when p < 0.5, zero when p = 0.5. Knowing the sign first makes the exact expected-value calculation in the next step a quick check.",
   },
   {
     id: "L3-S3",
@@ -961,6 +993,8 @@ export const steps: LessonStep[] = [
       incorrect: "Use n(2p - 1): 50 × (2 × 0.55 - 1).",
       hint: "2 × 0.55 = 1.10, and 1.10 - 1 = 0.10.",
     },
+    teach:
+      "The formula E[position] = n(2p − 1) is just 'per-step drift × number of steps.' Each step contributes 2p − 1 on average, and they add up. Plugging p = 0.5 gives 0, which recovers the fair walk — a good way to check you remember it.",
   },
   {
     id: "L3-S4",
@@ -979,6 +1013,8 @@ export const steps: LessonStep[] = [
       incorrect: "Break-even means +1 and -1 are equally likely.",
       hint: "A fair coin has p = 0.5.",
     },
+    teach:
+      "Setting the drift n(2p − 1) to zero forces p = 0.5. This is why the fair walk is the dividing line: below it the walk drifts down, above it drifts up, and exactly at it there is no trend at all.",
   },
   {
     id: "L3-S5",
@@ -1013,6 +1049,8 @@ export const steps: LessonStep[] = [
       incorrect: "Compare the two biases. The larger p(+1) creates the larger average drift.",
       hint: "0.58 is farther above 0.5 than 0.52.",
     },
+    teach:
+      "On average the bigger bias wins, but 'on average' is the key phrase — on any single race the underdog can still win by luck, because spread overlaps the gap in drift. Comparing averages while remembering the noise is exactly how real experiments are judged.",
   },
   {
     id: "L3-S7",
@@ -1056,6 +1094,8 @@ export const steps: LessonStep[] = [
       incorrect: "Fair walks can wander. They just do not prefer left or right on average.",
       hint: "A long streak of Heads is possible even with a fair coin.",
     },
+    teach:
+      "Rare big wanders do happen — they live in the tails of the distribution. Remembering that 'fair' constrains the average but not any single path will keep you from being fooled by streaks later in the advanced tail-risk lessons.",
   },
   {
     id: "L1-S8",
@@ -1114,6 +1154,8 @@ export const steps: LessonStep[] = [
       incorrect: "The chain uses today's state and transition chances. It ignores older history.",
       hint: "The Markov rule says: the present is enough.",
     },
+    teach:
+      "The Markov property — the future depends only on the present state — is what makes these systems easy to simulate and analyze. You never need the full history, just the current state and its transition probabilities.",
   },
   {
     id: "M1-S3",
@@ -1132,6 +1174,8 @@ export const steps: LessonStep[] = [
       incorrect: "The probabilities from one state must add to 1.",
       hint: "Subtract the sunny-to-sunny probability from 1.",
     },
+    teach:
+      "Every state's outgoing probabilities must sum to 1, because tomorrow has to be some state. That 'rows sum to 1' rule is your built-in error check whenever you read or build a transition table.",
   },
   {
     id: "M1-S4",
@@ -1156,6 +1200,8 @@ export const steps: LessonStep[] = [
       incorrect: "Higher Rainy→Rainy means rain is more likely to persist.",
       hint: "Think of the chain staying in the Rainy state.",
     },
+    teach:
+      "High self-transition probability creates streaks. This is why winning/losing runs and weather spells feel real — persistence in the transitions, not fate, clusters the outcomes. It also shapes the long-run mix you'll study in the advanced course.",
   },
   {
     id: "M1-S5",
@@ -1174,6 +1220,8 @@ export const steps: LessonStep[] = [
       incorrect: "Convert 40% to 0.4, then multiply by 10.",
       hint: "0.4 × 10 = ?",
     },
+    teach:
+      "Expected count = probability × number of trials. This simple multiply works for any 'how many out of N' question and reappears when you estimate sunny days from a long-run proportion in the advanced lessons.",
   },
   {
     id: "M1-S6",
@@ -1235,6 +1283,8 @@ export const steps: LessonStep[] = [
       incorrect: "The probability scale runs from 0 to 1.",
       hint: "Certain is the top of the probability scale.",
     },
+    teach:
+      "Anchor the scale in your mind: 0 = impossible, 1 = certain, 0.5 = a coin flip. Any valid probability lives between 0 and 1, so if a calculation ever gives you something outside that range, you know to recheck it.",
   },
   {
     id: "B1-S2",
@@ -1253,6 +1303,8 @@ export const steps: LessonStep[] = [
       incorrect: "Heads is one of two equally likely outcomes.",
       hint: "Write one half as a decimal.",
     },
+    teach:
+      "For equally likely outcomes, probability = favorable ÷ total. That single formula handles coins, dice, spinners, and marbles — the only trick is counting carefully. Converting between fractions, decimals, and percents keeps the next questions easy.",
   },
   {
     id: "B1-S3",
@@ -1323,6 +1375,8 @@ export const steps: LessonStep[] = [
       incorrect: "An event and its complement must add to 1.",
       hint: "Subtract the rain probability from 1.",
     },
+    teach:
+      "The complement rule, P(not A) = 1 − P(A), is one of the most useful shortcuts in probability. When an event is awkward to count directly, computing its opposite and subtracting from 1 is often far easier — as the 'at least one' question soon shows.",
   },
   {
     id: "B2-S2",
@@ -1377,6 +1431,8 @@ export const steps: LessonStep[] = [
       incorrect: "The complement of at least one Heads is no Heads at all.",
       hint: "No Heads means both flips are Tails.",
     },
+    teach:
+      "'At least one' is the classic signal to use the complement: instead of adding up every winning case, compute the single losing case (none happen) and subtract from 1. This trick scales to many coins or dice where direct counting would be painful.",
   },
   {
     id: "B2-S5",
@@ -1429,6 +1485,8 @@ export const steps: LessonStep[] = [
       incorrect: "The +1 step is slightly more likely than the -1 step.",
       hint: "Bias points toward the upper boundary.",
     },
+    teach:
+      "Which boundary you hit first depends on drift and starting distance together. Even a small bias, compounded over many steps, tilts the race toward the boundary it points at — the core mechanism behind gambler's ruin.",
   },
   {
     id: "A1-S3",
@@ -1447,6 +1505,8 @@ export const steps: LessonStep[] = [
       incorrect: "The start is exactly centered between the two boundaries.",
       hint: "Symmetry splits the chance evenly.",
     },
+    teach:
+      "For a fair walk, the probability of hitting the top before the bottom equals your fractional position between the boundaries. Start halfway and it's 1/2; start a quarter of the way up and it's 1/4. Distance is everything when there's no drift.",
   },
   {
     id: "A1-S4",
@@ -1465,6 +1525,8 @@ export const steps: LessonStep[] = [
       incorrect: "With no drift, distance to the boundary matters.",
       hint: "You are only 2 steps from 0 but 8 from 10.",
     },
+    teach:
+      "Closer boundary, higher chance: starting at 2 between 0 and 10 gives only a 2/10 chance of reaching 10 first. This is why a small bankroll against a big opponent is so likely to bust — the ruin boundary is simply nearer.",
   },
   {
     id: "A1-S5",
@@ -1523,6 +1585,8 @@ export const steps: LessonStep[] = [
       incorrect: "A sticky state tends to repeat itself.",
       hint: "Sunny→Sunny means staying sunny.",
     },
+    teach:
+      "Stickiness changes the texture of a sequence (longer streaks) but not necessarily the long-run proportion. Keep streakiness and long-run share as separate ideas — the next questions are about the stable long-run mix.",
   },
   {
     id: "A2-S3",
@@ -1541,6 +1605,8 @@ export const steps: LessonStep[] = [
       incorrect: "Multiply the long-run proportion by the number of days.",
       hint: "65% of 20 is 13.",
     },
+    teach:
+      "A long-run proportion acts like a probability per day, so expected count = proportion × days. But it's an average tendency, not a promise — the very next question makes that distinction explicit.",
   },
   {
     id: "A2-S4",

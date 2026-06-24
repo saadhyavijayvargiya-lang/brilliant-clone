@@ -44,6 +44,7 @@ export interface LessonStep {
     incorrect: string;
     hint?: string;
   };
+  teach?: string;
 }
 
 export interface Lesson {

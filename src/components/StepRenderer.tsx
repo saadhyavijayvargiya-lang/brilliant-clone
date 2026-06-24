@@ -71,6 +71,12 @@ export function StepRenderer({
           {feedback ?? step.feedback.correct}
         </div>
       ) : null}
+      {step.teach && (feedbackKind === "correct" || isComplete) ? (
+        <div className="teach-note">
+          <span className="teach-note-label">Key takeaway</span>
+          <p>{step.teach}</p>
+        </div>
+      ) : null}
     </section>
   );
 
