@@ -282,6 +282,89 @@ const extraLessonSpecs = [
   },
 ] as const;
 
+const extraExplanations: Record<string, string[]> = {
+  B3: [
+    "Expected value is the long-run average outcome of a random reward. To compute it, multiply each possible payout by its probability and add them up. A fair coin that pays 2 points for heads and 0 for tails has expected value (1/2)(2) + (1/2)(0) = 1 point per flip — even though you never actually win exactly 1 point on any single flip.",
+    "The simulator makes this concrete: as you add more trials, the running average payout wobbles at first and then settles near the expected value. That settling is the Law of Large Numbers in action — averages of many independent trials converge to the expectation, which is why casinos and insurers can predict their long-run results precisely while individual outcomes stay random.",
+  ],
+  B4: [
+    "Counting equally likely outcomes is the most basic way to find probabilities and averages. A fair six-sided die has outcomes 1 through 6, each with probability 1/6. Its expected value is the average of the faces: (1 + 2 + 3 + 4 + 5 + 6) / 6 = 3.5. You can never roll a 3.5, but it is the balance point of the outcomes.",
+    "Rolling the die many times in the simulator shows the sample average creeping toward 3.5. Small samples can sit well above or below it; large samples pin it down. This is the same convergence idea you'll use for every harder problem: when exact reasoning is tricky, simulate many equally likely outcomes and read the stable average.",
+  ],
+  B5: [
+    "Simulation is a problem-solving tool, not just a toy. When a probability question is hard to reason about directly, you can model the outcomes, run them many times, and read the answer off the results. The catch is that a few trials are noisy — the estimate jumps around — so you need enough repetitions for the pattern to stabilize.",
+    "The habit to build is: guess first, then simulate to check, then refine your reasoning. If a simulated average keeps drifting, that's a signal you need more trials, not that the math is broken. Treat simulation as a bridge between intuition and exact calculation, especially for the messier problems later in the course.",
+  ],
+  B6: [
+    "This lesson is about control: instead of letting randomness decide, you build a path step by step to hit a chosen target. Each move is +1 or -1, and your final position is the sum of the moves. To finish higher than you started, you need more +1 moves than -1 moves; the net displacement equals (number of +1 moves) minus (number of -1 moves).",
+    "Watching the animation between states matters as much as the endpoint. The same final position can be reached by many different paths, and the in-between states show how the walker actually traveled there. This 'path vs. endpoint' distinction is the seed of deeper ideas like counting paths and the reflection principle.",
+  ],
+  B7: [
+    "Comparing two noisy strategies is a classic trap: a single run can make the worse option look better purely by luck. The fix is to run each strategy many times and compare their averages, not their one-off results. The more trials you average, the more the random noise cancels and the true difference shows through.",
+    "This is why honest comparisons — A/B tests, medical trials, trading backtests — insist on large samples. The running-average view in the simulator demonstrates it directly: early on the averages cross and tangle, but with enough trials they separate and settle near their true expected values.",
+  ],
+  B8: [
+    "This review ties the beginner ideas together: probability as a number from 0 to 1, the complement rule, expected value as a probability-weighted average, and simulation as a way to check intuition. The single most useful first move on any probability question is to model the possible outcomes — list what can happen and how likely each is.",
+    "Once outcomes are modeled, the rest follows: count favorable cases for simple probabilities, subtract from 1 for complements, weight-and-sum for expected value, or simulate many trials when exact counting is hard. The goal isn't memorizing formulas; it's having a reliable way to turn a vague question into countable possibilities.",
+  ],
+  L6: [
+    "This lesson connects expected value back to random walks. The expected final position of a fair walk is 0, but you rarely see that from one walk. Instead, add up the final positions of many walks and divide — the running average is your estimate of the expectation, and for a fair walk it converges toward 0.",
+    "Watching the running average settle is the Law of Large Numbers applied to a process you already understand. Individual walks scatter widely (remember the sqrt(n) spread), yet their average collapses toward the true expected value as you add more of them. Averaging is how you extract a stable signal from very noisy data.",
+  ],
+  L7: [
+    "Here you connect the visual spread of a distribution to a precise rule. For a fair random walk, the typical distance from the start grows like the square root of the number of steps. After 400 steps the walk is usually within roughly sqrt(400) = 20 of the origin, not 400 — randomness partly cancels itself out.",
+    "This square-root scaling is why noise shrinks slowly: to halve your typical error you need four times as much data, because error falls like 1/sqrt(n). The histogram lets you see it — quadruple the steps and the cloud only doubles in width. This single fact governs measurement error, polling margins, and diffusion in physics.",
+  ],
+  M2: [
+    "A two-state game chain models a process that flips between, say, Winning and Losing, with fixed transition probabilities. As with weather, the next state depends only on the current one. When a state is 'sticky' — high probability of staying the same — outcomes cluster into streaks rather than alternating cleanly.",
+    "This explains why winning and losing streaks feel real even in fair-ish systems: persistence in the transition probabilities, not destiny, produces the clustering. Modeling it as a Markov chain lets you quantify how long streaks tend to last and how often the system switches sides.",
+  ],
+  M3: [
+    "A web surfer hopping from page to page is a textbook Markov chain: the next page depends mostly on the current page's links, not the entire browsing history. Treating each page as a state and each link as a transition probability turns 'how do people move through a site?' into a precise, simulatable model.",
+    "This is exactly the idea behind PageRank: model the whole web as a giant Markov chain and find which pages a random surfer visits most in the long run. The same framing powers recommendation systems, navigation analytics, and any 'what comes next?' problem where the present state carries the important information.",
+  ],
+  L8: [
+    "Designing a walk flips the usual question around: rather than predicting where randomness lands, you choose a sequence of +1/-1 moves to reach a specific final state in a fixed number of steps. This forces you to think about net displacement — the difference between up-moves and down-moves — and which combinations are even possible.",
+    "Notice that many different step sequences can reach the same endpoint. Counting how many paths lead to a given final position is the combinatorial heart of random walks, and it's what makes some endings far more likely than others when the moves are random. Controlling the endpoint first builds the intuition for counting paths later.",
+  ],
+  L9: [
+    "This lesson estimates drift by simulation. If you add up many step outcomes and the running average sits above 0, the process has positive drift; if it hovers at 0, it's drift-free. The sign and size of that stable average is the per-step drift, exactly the 2p - 1 quantity from the bias lesson.",
+    "The point is that you can detect and measure drift empirically, without knowing p in advance — just average enough samples and read the result. This is how real analysts decide whether a noisy series (returns, sensor readings, click rates) has a genuine trend or is just wandering randomly.",
+  ],
+  M4: [
+    "Animating a state plan highlights that in a sequence of states, the path between endpoints carries real information — not just where you end. Two plans with the same final state can pass through completely different intermediate states, and in many systems those middle states are what you actually care about.",
+    "This matters for Markov models because the chain's behavior is the whole trajectory of states, step by step. Watching the middle states reveals streaks, detours, and near-misses that a single summary number would hide, reinforcing that a process is a sequence, not just an outcome.",
+  ],
+  A3: [
+    "Gambler's ruin is the boundary-hitting problem applied to a bankroll. You start with some capital and bet repeatedly until you either reach a goal or go broke (0). Both 0 and the goal are absorbing — the game ends when you touch either. The central question is the probability of ruin versus reaching the goal.",
+    "For a fair game with equal distances to win and lose, the ruin probability is about 1/2 by symmetry. Two facts surprise people: even a fair game ends in ruin or victory with certainty (you can't wander forever between fixed walls), and against a much richer opponent — like a casino — ruin becomes nearly certain because their boundary is effectively infinitely far away.",
+  ],
+  A4: [
+    "Rare events live in the thin tails of a distribution — outcomes far from the center that happen only occasionally. Estimating their probability by simulation is hard precisely because they're rare: in a small batch you might see zero of them, giving you no useful estimate. You need a large number of trials before rare outcomes appear often enough to measure.",
+    "This is a practical warning as much as a concept. Underestimating tail risk — because a short simulation or short history never showed it — is behind many real failures in finance, engineering, and safety. When the event matters but is rare, you must run many trials (or use smarter techniques) to see the tail at all.",
+  ],
+  A5: [
+    "An equilibrium lab shows long-run proportions emerging from repeated transitions. Run a Markov chain long enough and the share of time spent in each state stabilizes into the stationary distribution, regardless of where you started. The randomness never stops, but the averages stop moving.",
+    "Reading equilibrium correctly is the skill: it describes average behavior over many steps, not a fixed guarantee for any short window. This steady-state view answers 'what mix of states will this system occupy in the long run?' — the question behind capacity planning, PageRank, and population models.",
+  ],
+  A6: [
+    "Ruin sensitivity is about how the chance of going broke responds to small changes in your setup. Two levers dominate: your starting capital and your per-bet edge. More starting capital pushes the ruin boundary farther away, so ruin becomes less likely; a positive edge (favorable probability) helps even more, while a negative edge eventually dooms you no matter the bankroll.",
+    "The simulator lets you nudge these and watch ruin rates move, which builds risk intuition: survival is about both your buffer and your edge, and a tiny disadvantage repeated many times is far more dangerous than it looks. This is the quantitative core of bankroll management and risk-of-ruin analysis.",
+  ],
+  A7: [
+    "Tail hunting means deliberately studying the far edges of a distribution — the unusually large or small outcomes. The center of a distribution is easy; the tails are where the surprising, high-impact events live, and they're rare enough that you need big simulations to see them clearly.",
+    "Looking at the histogram's edges trains you to ask 'how bad (or good) can it get, and how often?' rather than only 'what's typical?' Tail thinking is what separates naive averages from real risk assessment, and it's essential anywhere extreme outcomes carry outsized consequences.",
+  ],
+  A8: [
+    "Hitting a boundary on purpose combines path design with the absorbing-boundary idea. You construct a path that reaches a specific target state exactly, which means respecting both the number of steps and the net displacement needed. A boundary is a state where the process stops or changes rule — reaching it is the whole objective.",
+    "This reinforces that boundaries reshape a process: instead of free wandering, the walk has a destination that ends the story. Understanding how starting point, step budget, and boundary location interact is what lets you reason about first-passage problems — when, and whether, a process reaches a critical level.",
+  ],
+  A9: [
+    "This capstone review ties the advanced toolkit together: running averages for expected value, the square-root law for spread, boundaries for first-passage and ruin, tails for rare events, and stationary distributions for long-run state behavior. The unifying theme is that large numbers of random trials produce stable, predictable summaries.",
+    "The meta-skill is using simulation as a bridge to intuition: when a hard probability problem resists exact calculation, model it, run many trials, inspect the center and the tails, and let the stable patterns guide your reasoning. That workflow — predict, simulate, compare, refine — is how working practitioners handle real stochastic systems.",
+  ],
+};
+
 const extraLessons: Lesson[] = extraLessonSpecs.map((spec) => ({
   id: spec.id,
   courseId: spec.courseId,
@@ -291,6 +374,7 @@ const extraLessons: Lesson[] = extraLessonSpecs.map((spec) => ({
   stepIds: Array.from({ length: 5 }, (_, index) => `${spec.id}-S${index + 1}`),
   unlockAfter: spec.unlockAfter,
   estimatedMinutes: 5,
+  explanation: extraExplanations[spec.id],
 }));
 
 function makeExtraSteps(): LessonStep[] {
@@ -437,6 +521,11 @@ export const lessons: Lesson[] = [
     ],
     unlockAfter: null,
     estimatedMinutes: 4,
+    explanation: [
+      "A random walk is one of the simplest random processes you can build, and it shows up everywhere — stock prices, diffusing particles, gambling, and even how animals forage. The whole idea: you start at position 0 on a number line, and at every step you flip a coin. Heads moves you one unit right (+1), tails moves you one unit left (-1). Your position at any time is just the running sum of all those +1 and -1 steps.",
+      "When the coin is fair, each step is +1 or -1 with equal probability, so the average value of a single step is zero: (1/2)(+1) + (1/2)(-1) = 0. Because the average of each step is 0, the expected (average) position after any number of steps is also 0. 'Expected' does not mean 'guaranteed' — it means that if you repeated the whole walk thousands of times and averaged the final positions, you'd get something very close to 0.",
+      "Here's the part that surprises people: even though the average is 0, almost no individual walk ends exactly at 0. A single path is noisy and jagged. You can get long streaks of heads that carry you far to the right, or wander back and forth near the start. Fairness controls the long-run average across many walks, not what any one walk does. That tension — predictable on average, unpredictable individually — is the heart of probability, and the rest of this course builds on it.",
+    ],
   },
   {
     id: "L2",
@@ -447,6 +536,11 @@ export const lessons: Lesson[] = [
     stepIds: ["L2-S1", "L2-S2", "L2-S3", "L2-S4", "L2-S5", "L2-S6", "L2-S7"],
     unlockAfter: "L1",
     estimatedMinutes: 4,
+    explanation: [
+      "One random walk is noisy and hard to learn from. The trick used everywhere in probability is to repeat the experiment many times and look at the pattern of outcomes. If you run a thousand fair walks of the same length and record where each one ends, you get a distribution: a picture of which final positions are common and which are rare. The histogram in this lesson is exactly that picture — each bar counts how many walks landed in that region.",
+      "Two things matter about this distribution: its center and its spread. For a fair walk the center stays at 0 no matter how many steps you take, because there is no built-in direction. But the spread grows as you add steps. The walk has more chances to wander, so extreme endings become more possible. Crucially, the center does not move — only the width of the cloud changes.",
+      "The spread grows in a very specific way: the typical distance from 0 scales with the square root of the number of steps, not the number of steps itself. After 100 steps a fair walk is usually within about sqrt(100) = 10 of the origin; after 400 steps it is usually within about sqrt(400) = 20. So quadrupling the steps only doubles the typical distance. This 'square-root law' is one of the most important facts in probability and is the reason large random systems are more predictable in aggregate than you'd guess.",
+    ],
   },
   {
     id: "L3",
@@ -457,6 +551,11 @@ export const lessons: Lesson[] = [
     stepIds: ["L3-S1", "L3-S2", "L3-S3", "L3-S4", "L3-S5", "L3-S6", "L3-S7"],
     unlockAfter: "L2",
     estimatedMinutes: 4,
+    explanation: [
+      "So far the coin was fair. Now we tilt it. Let p be the probability of a +1 step (so 1 - p is the probability of -1). When p is bigger than 0.5, right steps happen more often than left steps, and the walk picks up a steady lean called drift. Drift is the part of the motion you can predict; the randomness still rides on top of it.",
+      "The average value of one biased step is (p)(+1) + (1 - p)(-1) = 2p - 1. Multiply by the number of steps n and you get the expected position: E[position] = n(2p - 1). For example, with p = 0.55 over 50 steps, that's 50 × (2(0.55) - 1) = 50 × 0.1 = 5. When p = 0.5 the formula gives 0, which matches the fair walk — fairness is just the special case with no drift.",
+      "The key mental model: bias moves the center of the distribution, while randomness still spreads the cloud around that moving center. A biased walk and a fair walk both diffuse (spread out like sqrt(n)), but only the biased one marches in a direction. Comparing two walkers with different p values, the one with the larger p will, on average, end farther to the right — even though on any single race the underdog can still win by luck.",
+    ],
   },
   {
     id: "L4",
@@ -487,6 +586,11 @@ export const lessons: Lesson[] = [
     stepIds: ["M1-S1", "M1-S2", "M1-S3", "M1-S4", "M1-S5", "M1-S6", "M1-S7"],
     unlockAfter: "L3",
     estimatedMinutes: 6,
+    explanation: [
+      "A Markov chain is a system that hops between named states, where the only thing that decides the next state is the current state — not the full history of how you got there. This 'the present is enough' rule is called the Markov property, or being memoryless. In this lesson the states are Sunny and Rainy, and each day the weather jumps to the next state according to fixed transition probabilities.",
+      "We organize those probabilities into rules like P(Sunny tomorrow | Sunny today) = 0.75. Every state's outgoing probabilities must add to 1, because tomorrow has to be something: if sunny-to-sunny is 0.75, then sunny-to-rainy must be 0.25. A state is called 'sticky' when it tends to stay itself — a high Rainy-to-Rainy probability produces long rainy streaks, which is exactly why real weather clusters.",
+      "Markov chains matter far beyond weather. A web surfer clicking from page to page, words in a sentence, board-game positions, customer subscription states, and queues are all naturally modeled this way — in fact, the original PageRank algorithm behind Google treated the web as one giant Markov chain. Once you know the current state and the transition probabilities, you can simulate the future or compute long-run behavior, which is the focus of the advanced course.",
+    ],
   },
   {
     id: "B1",
@@ -497,6 +601,11 @@ export const lessons: Lesson[] = [
     stepIds: ["B1-S1", "B1-S2", "B1-S3", "B1-S4", "B1-S5"],
     unlockAfter: null,
     estimatedMinutes: 5,
+    explanation: [
+      "Probability is just a number between 0 and 1 that measures how likely something is. A probability of 0 means impossible, 1 means certain, and everything in between describes uncertainty: 0.5 is a 50/50 coin flip, 0.9 is very likely, 0.1 is unlikely. Whenever you see a percentage like 25%, it is the same idea written differently — divide by 100 to get the decimal probability 0.25.",
+      "For situations where every outcome is equally likely, probability is a simple fraction: favorable outcomes divided by total outcomes. A bag with 3 blue and 1 red marble gives P(blue) = 3/4, because 3 of the 4 equally likely marbles are blue. A fair coin gives P(heads) = 1/2, and a fair die gives P(any specific face) = 1/6.",
+      "The reason this matters: once you can put a number on chance, you can compare risks, combine events, and predict long-run behavior instead of just guessing. The mental habit to build is 'count the possibilities, then count the ones you care about.' Everything else in probability — complements, expected value, simulations — is built on top of this simple scale.",
+    ],
   },
   {
     id: "B2",
@@ -507,6 +616,11 @@ export const lessons: Lesson[] = [
     stepIds: ["B2-S1", "B2-S2", "B2-S3", "B2-S4", "B2-S5"],
     unlockAfter: "B1",
     estimatedMinutes: 5,
+    explanation: [
+      "Two simple rules let you solve a huge fraction of probability questions. The first is the complement rule: the probability that something does NOT happen is 1 minus the probability that it does. If P(rain) = 0.3, then P(no rain) = 1 - 0.3 = 0.7. This works because an event and its opposite together cover every possibility, so their probabilities must add to 1.",
+      "The second is combining 'either-or' outcomes. When outcomes are equally likely and don't overlap, you add up the favorable ones. On a 4-color spinner, P(red or blue) = 2/4 = 1/2, because two of the four equal sections qualify. (When events can overlap you have to be more careful, but the equally-likely case is the foundation.)",
+      "The complement rule shines on 'at least one' questions, which are annoying to count directly. To find P(at least one heads in two flips), flip the problem: the only way to fail is two tails, with probability 1/4, so the answer is 1 - 1/4 = 3/4. The big lesson: when an event is complicated, ask what would make it fail — the opposite is often far easier to count.",
+    ],
   },
   {
     id: "A1",
@@ -517,6 +631,11 @@ export const lessons: Lesson[] = [
     stepIds: ["A1-S1", "A1-S2", "A1-S3", "A1-S4", "A1-S5"],
     unlockAfter: null,
     estimatedMinutes: 6,
+    explanation: [
+      "Boundary-hitting problems ask a different question than 'where do you end up?' They ask 'which target do you reach first?' Picture a walker between a lower boundary at 0 and an upper boundary at 10. The walk continues until it touches one of them — these are called absorbing boundaries because once you arrive, the process stops. The question is the probability of hitting the top before the bottom.",
+      "Two forces decide the answer: drift and starting position. With a fair walk (no drift), only distance matters, and by symmetry the probability of hitting the top first is your fractional position between the boundaries. Start halfway between 0 and 10 and you have a 50/50 chance; start at 2 and you are much more likely to hit 0 first, simply because it is closer.",
+      "Add even a small upward bias and the odds shift toward the upper boundary, because the steady drift accumulates over many steps and overpowers pure distance. This is the mathematical backbone of gambler's ruin, option pricing, and reliability analysis: combine where you start, how strong the drift is, and where the walls are, and you can predict which outcome wins the race — on average.",
+    ],
   },
   {
     id: "A2",
@@ -527,6 +646,11 @@ export const lessons: Lesson[] = [
     stepIds: ["A2-S1", "A2-S2", "A2-S3", "A2-S4", "A2-S5"],
     unlockAfter: "A1",
     estimatedMinutes: 6,
+    explanation: [
+      "Run a Markov chain for a long time and something remarkable happens: the fraction of time it spends in each state settles down to stable numbers, even though the individual hops stay random. These long-run proportions are called the stationary (or equilibrium) distribution. A weather chain might end up sunny 65% of the time and rainy 35% of the time, regardless of whether it started sunny or rainy.",
+      "It is important to read '65% sunny' correctly. It does not promise exactly 13 sunny days in every 20-day stretch. It is a tendency that the average share approaches as the number of days grows. Short runs still wobble; the equilibrium is about the long-run average, not a guarantee for any particular window.",
+      "Equilibrium distributions are why Markov models are so useful in practice. They tell you the steady-state behavior of a system — the typical mix of states it will occupy — which powers things like PageRank's importance scores, queueing and capacity planning, and population models. You combine the same ingredients from the whole course: states, transitions, randomness, and large numbers of repetitions producing stable averages.",
+    ],
   },
   ...extraLessons,
 ];

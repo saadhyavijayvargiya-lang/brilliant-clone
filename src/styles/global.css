@@ -1353,6 +1353,69 @@ a {
   color: #ffb4b3;
 }
 
+.concept-guide {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(108, 92, 231, 0.12), rgba(26, 29, 39, 0.85));
+  overflow: hidden;
+}
+
+.concept-guide > summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.concept-guide > summary::-webkit-details-marker {
+  display: none;
+}
+
+.concept-guide > summary::after {
+  content: "+";
+  position: absolute;
+  right: 1.15rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.concept-guide[open] > summary::after {
+  content: "–";
+}
+
+.concept-guide > summary {
+  position: relative;
+}
+
+.concept-guide-label {
+  color: var(--accent-correct);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.concept-guide-hint {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.concept-guide-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0 1.15rem 1.2rem;
+}
+
+.concept-guide-body p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 .answer-panel {
   display: grid;
   gap: 0.75rem;

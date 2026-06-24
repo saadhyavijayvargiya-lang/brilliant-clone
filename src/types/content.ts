@@ -55,6 +55,7 @@ export interface Lesson {
   stepIds: string[];
   unlockAfter: string | null;
   estimatedMinutes: number;
+  explanation?: string[];
 }
 
 export interface Course {

@@ -88,6 +88,21 @@ export function LessonPage({
         </div>
       </aside>
       <div>
+        {lesson.explanation && lesson.explanation.length > 0 ? (
+          <details className="concept-guide" open={stepIndex === 0}>
+            <summary>
+              <span className="concept-guide-label">Concept guide</span>
+              <span className="concept-guide-hint">
+                Read this to understand what this lesson is really about
+              </span>
+            </summary>
+            <div className="concept-guide-body">
+              {lesson.explanation.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+          </details>
+        ) : null}
         <StepRenderer
           key={step.id}
           step={step}
