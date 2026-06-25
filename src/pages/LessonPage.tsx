@@ -117,6 +117,8 @@ export function LessonPage({
           step={step}
           isComplete={isStepComplete}
           onIncorrect={onIncorrectAnswer}
+          lessonTitle={lesson.title}
+          conceptSummary={lesson.explanation?.[0]}
           onComplete={() =>
             onCompleteStep(lesson.id, step.id, stepIndex, steps.length)
           }

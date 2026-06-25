@@ -1555,6 +1555,51 @@ a {
   background: rgba(108, 92, 231, 0.1);
 }
 
+.tutor-block {
+  margin-top: 1rem;
+}
+
+.tutor-button {
+  width: 100%;
+}
+
+.tutor-note {
+  margin-top: 0.75rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(0, 206, 201, 0.35);
+  border-left: 3px solid var(--accent-correct);
+  border-radius: 0.9rem;
+  background: rgba(0, 206, 201, 0.08);
+  animation: pageIn 200ms ease both;
+}
+
+.tutor-note-error {
+  border-color: rgba(255, 184, 107, 0.4);
+  border-left-color: #ffb86b;
+  background: rgba(255, 184, 107, 0.08);
+}
+
+.tutor-note-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--accent-correct);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tutor-note-error .tutor-note-label {
+  color: #ffb86b;
+}
+
+.tutor-note p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 .teach-note-label {
   display: block;
   margin-bottom: 0.3rem;

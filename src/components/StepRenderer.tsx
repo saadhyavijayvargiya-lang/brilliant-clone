@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { validateAnswer } from "../lib/validators";
+import { AI_ENABLED } from "../lib/ai";
+import { getTutorFeedback } from "../lib/aiTutor";
 import type { LessonStep } from "../types/content";
 import { BiasSliderSim } from "../widgets/BiasSliderSim";
 import { HistogramSim } from "../widgets/HistogramSim";
@@ -16,6 +18,8 @@ interface StepRendererProps {
   onComplete: (summary?: Record<string, number | string>) => void;
   onIncorrect: () => void;
   isComplete: boolean;
+  lessonTitle?: string;
+  conceptSummary?: string;
 }
 
 export function StepRenderer({
@@ -23,6 +27,8 @@ export function StepRenderer({
   onComplete,
   onIncorrect,
   isComplete,
+  lessonTitle,
+  conceptSummary,
 }: StepRendererProps) {
   const [answer, setAnswer] = useState("");
   const [selectedChoice, setSelectedChoice] = useState("");
@@ -31,6 +37,10 @@ export function StepRenderer({
   const [feedbackKind, setFeedbackKind] = useState<"correct" | "wrong" | null>(
     null
   );
+  const [lastWrongAnswer, setLastWrongAnswer] = useState("");
+  const [tutorText, setTutorText] = useState<string | null>(null);
+  const [tutorLoading, setTutorLoading] = useState(false);
+  const [tutorError, setTutorError] = useState<string | null>(null);
 
   const params = step.interaction.params ?? {};
 
@@ -49,6 +59,7 @@ export function StepRenderer({
 
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
+    setLastWrongAnswer(String(value ?? ""));
     onIncorrect();
     setFeedbackKind("wrong");
     setFeedback(
@@ -56,6 +67,27 @@ export function StepRenderer({
         ? `${step.feedback.incorrect} Hint: ${step.feedback.hint}`
         : step.feedback.incorrect
     );
+  }
+
+  async function askTutor() {
+    setTutorLoading(true);
+    setTutorError(null);
+    try {
+      const text = await getTutorFeedback({
+        lessonTitle: lessonTitle ?? "Probability",
+        conceptSummary,
+        question: `${step.title} — ${step.body}`,
+        userAnswer: lastWrongAnswer,
+        correctIdea: step.feedback.correct,
+      });
+      setTutorText(text);
+    } catch {
+      setTutorError(
+        "The AI tutor isn't switched on yet. Once Firebase AI Logic is enabled for this project, this button gives personalized help."
+      );
+    } finally {
+      setTutorLoading(false);
+    }
   }
 
   return (
@@ -77,6 +109,31 @@ export function StepRenderer({
         <div className="teach-note">
           <span className="teach-note-label">Key takeaway</span>
           <p>{step.teach}</p>
+        </div>
+      ) : null}
+      {AI_ENABLED && feedbackKind === "wrong" ? (
+        <div className="tutor-block">
+          {!tutorText ? (
+            <button
+              className="button button-secondary tutor-button"
+              onClick={askTutor}
+              disabled={tutorLoading}
+            >
+              {tutorLoading ? "Thinking…" : "✦ Ask the AI tutor"}
+            </button>
+          ) : null}
+          {tutorText ? (
+            <div className="tutor-note">
+              <span className="tutor-note-label">AI tutor</span>
+              <p>{tutorText}</p>
+            </div>
+          ) : null}
+          {tutorError ? (
+            <div className="tutor-note tutor-note-error">
+              <span className="tutor-note-label">AI tutor</span>
+              <p>{tutorError}</p>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
