@@ -1600,6 +1600,66 @@ a {
   white-space: pre-wrap;
 }
 
+.challenge-card {
+  margin-top: 0.75rem;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid rgba(108, 92, 231, 0.4);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(0, 206, 201, 0.12), transparent 12rem),
+    rgba(108, 92, 231, 0.08);
+  animation: pageIn 220ms ease both;
+}
+
+.challenge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.challenge-diff {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.challenge-insight {
+  margin: 0.5rem 0 0;
+  color: var(--accent-correct);
+  font-weight: 700;
+}
+
+.challenge-question {
+  margin: 0.4rem 0 0;
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.choice-button.choice-correct {
+  border-color: rgba(0, 206, 201, 0.7);
+  background: rgba(0, 206, 201, 0.14);
+  color: var(--text-primary);
+}
+
+.choice-button.choice-wrong {
+  border-color: rgba(255, 118, 117, 0.7);
+  background: rgba(255, 118, 117, 0.14);
+  color: var(--text-primary);
+}
+
+.challenge-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
 .teach-note-label {
   display: block;
   margin-bottom: 0.3rem;

@@ -18,6 +18,7 @@ interface LessonPageProps {
   ) => void;
   onGoToStep: (lessonId: string, stepIndex: number) => void;
   onIncorrectAnswer: () => void;
+  onAwardXp: (amount: number) => void;
 }
 
 export function LessonPage({
@@ -25,6 +26,7 @@ export function LessonPage({
   onCompleteStep,
   onGoToStep,
   onIncorrectAnswer,
+  onAwardXp,
 }: LessonPageProps) {
   const { lessonId } = useParams();
   if (!lessonId) return <Navigate to="/course" replace />;
@@ -119,6 +121,7 @@ export function LessonPage({
           onIncorrect={onIncorrectAnswer}
           lessonTitle={lesson.title}
           conceptSummary={lesson.explanation?.[0]}
+          onAwardXp={onAwardXp}
           onComplete={() =>
             onCompleteStep(lesson.id, step.id, stepIndex, steps.length)
           }

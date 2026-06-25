@@ -56,6 +56,18 @@ export function setAvatar(progress: AppProgress, avatar: string): AppProgress {
   return nextProgress;
 }
 
+export function awardExperience(
+  progress: AppProgress,
+  amount: number
+): AppProgress {
+  const nextProgress = {
+    ...progress,
+    experiencePoints: (progress.experiencePoints ?? 0) + amount,
+  };
+  saveProgress(nextProgress);
+  return nextProgress;
+}
+
 export function setDisplayName(
   progress: AppProgress,
   displayName: string,

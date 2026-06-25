@@ -25,6 +25,7 @@ export default function App() {
     updateDisplayName,
     updateProfileBackground,
     updateAvatar,
+    awardXp,
     switchAccount,
   } =
     useLocalProgress();
@@ -99,6 +100,7 @@ export default function App() {
               onCompleteStep={completeStep}
               onGoToStep={goToStep}
               onIncorrectAnswer={recordIncorrect}
+              onAwardXp={awardXp}
             />
           }
         />

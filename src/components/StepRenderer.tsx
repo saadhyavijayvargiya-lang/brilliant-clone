@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { validateAnswer } from "../lib/validators";
 import { AI_ENABLED } from "../lib/ai";
-import { getTutorFeedback } from "../lib/aiTutor";
+import { generateChallenge } from "../lib/aiTutor";
+import type { Challenge, ChallengeDifficulty } from "../lib/aiTutor";
 import type { LessonStep } from "../types/content";
 import { BiasSliderSim } from "../widgets/BiasSliderSim";
 import { HistogramSim } from "../widgets/HistogramSim";
@@ -20,6 +21,7 @@ interface StepRendererProps {
   isComplete: boolean;
   lessonTitle?: string;
   conceptSummary?: string;
+  onAwardXp?: (amount: number) => void;
 }
 
 export function StepRenderer({
@@ -29,6 +31,7 @@ export function StepRenderer({
   isComplete,
   lessonTitle,
   conceptSummary,
+  onAwardXp,
 }: StepRendererProps) {
   const [answer, setAnswer] = useState("");
   const [selectedChoice, setSelectedChoice] = useState("");
@@ -38,9 +41,14 @@ export function StepRenderer({
     null
   );
   const [lastWrongAnswer, setLastWrongAnswer] = useState("");
-  const [tutorText, setTutorText] = useState<string | null>(null);
-  const [tutorLoading, setTutorLoading] = useState(false);
-  const [tutorError, setTutorError] = useState<string | null>(null);
+
+  // Adaptive AI challenge state
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [challengeLoading, setChallengeLoading] = useState(false);
+  const [challengeError, setChallengeError] = useState<string | null>(null);
+  const [pickedChoice, setPickedChoice] = useState<number | null>(null);
+  const [difficulty, setDifficulty] = useState<ChallengeDifficulty>("similar");
+  const [challengeWins, setChallengeWins] = useState(0);
 
   const params = step.interaction.params ?? {};
 
@@ -69,24 +77,37 @@ export function StepRenderer({
     );
   }
 
-  async function askTutor() {
-    setTutorLoading(true);
-    setTutorError(null);
+  async function loadChallenge(nextDifficulty: ChallengeDifficulty) {
+    setChallengeLoading(true);
+    setChallengeError(null);
+    setChallenge(null);
+    setPickedChoice(null);
+    setDifficulty(nextDifficulty);
     try {
-      const text = await getTutorFeedback({
+      const next = await generateChallenge({
         lessonTitle: lessonTitle ?? "Probability",
         conceptSummary,
         question: `${step.title} — ${step.body}`,
         userAnswer: lastWrongAnswer,
         correctIdea: step.feedback.correct,
+        difficulty: nextDifficulty,
       });
-      setTutorText(text);
+      setChallenge(next);
     } catch {
-      setTutorError(
-        "The AI tutor isn't switched on yet. Once Firebase AI Logic is enabled for this project, this button gives personalized help."
+      setChallengeError(
+        "The AI tutor isn't switched on yet. Once Firebase AI Logic is enabled for this project, you'll get fresh tailored challenges here."
       );
     } finally {
-      setTutorLoading(false);
+      setChallengeLoading(false);
+    }
+  }
+
+  function pickChallengeChoice(index: number) {
+    if (pickedChoice !== null || !challenge) return;
+    setPickedChoice(index);
+    if (index === challenge.correctIndex) {
+      setChallengeWins((wins) => wins + 1);
+      onAwardXp?.(15);
     }
   }
 
@@ -113,25 +134,104 @@ export function StepRenderer({
       ) : null}
       {AI_ENABLED && feedbackKind === "wrong" ? (
         <div className="tutor-block">
-          {!tutorText ? (
+          {!challenge && !challengeError ? (
             <button
               className="button button-secondary tutor-button"
-              onClick={askTutor}
-              disabled={tutorLoading}
+              onClick={() => loadChallenge("similar")}
+              disabled={challengeLoading}
             >
-              {tutorLoading ? "Thinking…" : "✦ Ask the AI tutor"}
+              {challengeLoading
+                ? "Spinning up a challenge…"
+                : "✦ Tutor Challenge — practice this until it clicks"}
             </button>
           ) : null}
-          {tutorText ? (
-            <div className="tutor-note">
-              <span className="tutor-note-label">AI tutor</span>
-              <p>{tutorText}</p>
-            </div>
-          ) : null}
-          {tutorError ? (
+
+          {challengeError ? (
             <div className="tutor-note tutor-note-error">
               <span className="tutor-note-label">AI tutor</span>
-              <p>{tutorError}</p>
+              <p>{challengeError}</p>
+            </div>
+          ) : null}
+
+          {challenge ? (
+            <div className="challenge-card">
+              <div className="challenge-head">
+                <span className="tutor-note-label">
+                  ✦ Tutor Challenge
+                  {challengeWins > 0 ? ` · ${challengeWins} nailed` : ""}
+                </span>
+                <span className="challenge-diff">{difficulty}</span>
+              </div>
+              {challenge.insight ? (
+                <p className="challenge-insight">{challenge.insight}</p>
+              ) : null}
+              <p className="challenge-question">{challenge.question}</p>
+              <div className="answer-panel">
+                {challenge.choices.map((choice, index) => {
+                  const isPicked = pickedChoice === index;
+                  const isAnswer = challenge.correctIndex === index;
+                  const revealed = pickedChoice !== null;
+                  const cls = revealed
+                    ? isAnswer
+                      ? "choice-button choice-correct"
+                      : isPicked
+                        ? "choice-button choice-wrong"
+                        : "choice-button"
+                    : "choice-button";
+                  return (
+                    <button
+                      key={`${choice}-${index}`}
+                      className={cls}
+                      onClick={() => pickChallengeChoice(index)}
+                      disabled={revealed}
+                    >
+                      {choice}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {pickedChoice !== null ? (
+                <>
+                  <div
+                    className={`feedback ${
+                      pickedChoice === challenge.correctIndex
+                        ? "feedback-correct"
+                        : "feedback-wrong"
+                    }`}
+                  >
+                    {pickedChoice === challenge.correctIndex
+                      ? `Nailed it! +15 XP. ${challenge.nudge}`
+                      : challenge.explanation}
+                  </div>
+                  <div className="challenge-actions">
+                    {pickedChoice === challenge.correctIndex ? (
+                      <button
+                        className="button"
+                        onClick={() => loadChallenge("harder")}
+                        disabled={challengeLoading}
+                      >
+                        Level up — harder one
+                      </button>
+                    ) : (
+                      <button
+                        className="button"
+                        onClick={() => loadChallenge("easier")}
+                        disabled={challengeLoading}
+                      >
+                        Try an easier one
+                      </button>
+                    )}
+                    <button
+                      className="button button-secondary"
+                      onClick={() => loadChallenge("similar")}
+                      disabled={challengeLoading}
+                    >
+                      Another like this
+                    </button>
+                  </div>
+                </>
+              ) : null}
             </div>
           ) : null}
         </div>

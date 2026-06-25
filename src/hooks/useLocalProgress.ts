@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AppProgress } from "../types/content";
 import {
+  awardExperience,
   defaultProgress,
   loadProgress,
   markIncorrect,
@@ -58,6 +59,10 @@ export function useLocalProgress() {
     setProgressState((current) => setAvatar(current, avatar));
   }, []);
 
+  const awardXp = useCallback((amount: number) => {
+    setProgressState((current) => awardExperience(current, amount));
+  }, []);
+
   const switchAccount = useCallback((uid: string | null) => {
     setActiveAccount(uid);
     if (uid) {
@@ -81,6 +86,7 @@ export function useLocalProgress() {
     updateDisplayName,
     updateProfileBackground,
     updateAvatar,
+    awardXp,
     switchAccount,
   };
 }
