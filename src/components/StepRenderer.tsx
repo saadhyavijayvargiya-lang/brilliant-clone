@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { validateAnswer } from "../lib/validators";
 import { AI_ENABLED } from "../lib/ai";
-import { generateChallenge } from "../lib/aiTutor";
-import type { Challenge, ChallengeDifficulty } from "../lib/aiTutor";
+import { TutorChallenge } from "./TutorChallenge";
 import type { LessonStep } from "../types/content";
 import { BiasSliderSim } from "../widgets/BiasSliderSim";
 import { HistogramSim } from "../widgets/HistogramSim";
@@ -17,7 +16,7 @@ import { SpinnerSim } from "../widgets/SpinnerSim";
 interface StepRendererProps {
   step: LessonStep;
   onComplete: (summary?: Record<string, number | string>) => void;
-  onIncorrect: () => void;
+  onIncorrect: (stepId: string) => void;
   isComplete: boolean;
   lessonTitle?: string;
   conceptSummary?: string;
@@ -42,14 +41,6 @@ export function StepRenderer({
   );
   const [lastWrongAnswer, setLastWrongAnswer] = useState("");
 
-  // Adaptive AI challenge state
-  const [challenge, setChallenge] = useState<Challenge | null>(null);
-  const [challengeLoading, setChallengeLoading] = useState(false);
-  const [challengeError, setChallengeError] = useState<string | null>(null);
-  const [pickedChoice, setPickedChoice] = useState<number | null>(null);
-  const [difficulty, setDifficulty] = useState<ChallengeDifficulty>("similar");
-  const [challengeWins, setChallengeWins] = useState(0);
-
   const params = step.interaction.params ?? {};
 
   function markComplete(summary?: Record<string, number | string>) {
@@ -68,47 +59,13 @@ export function StepRenderer({
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
     setLastWrongAnswer(String(value ?? ""));
-    onIncorrect();
+    onIncorrect(step.id);
     setFeedbackKind("wrong");
     setFeedback(
       nextAttempts >= 2 && step.feedback.hint
         ? `${step.feedback.incorrect} Hint: ${step.feedback.hint}`
         : step.feedback.incorrect
     );
-  }
-
-  async function loadChallenge(nextDifficulty: ChallengeDifficulty) {
-    setChallengeLoading(true);
-    setChallengeError(null);
-    setChallenge(null);
-    setPickedChoice(null);
-    setDifficulty(nextDifficulty);
-    try {
-      const next = await generateChallenge({
-        lessonTitle: lessonTitle ?? "Probability",
-        conceptSummary,
-        question: `${step.title} — ${step.body}`,
-        userAnswer: lastWrongAnswer,
-        correctIdea: step.feedback.correct,
-        difficulty: nextDifficulty,
-      });
-      setChallenge(next);
-    } catch {
-      setChallengeError(
-        "The AI tutor isn't switched on yet. Once Firebase AI Logic is enabled for this project, you'll get fresh tailored challenges here."
-      );
-    } finally {
-      setChallengeLoading(false);
-    }
-  }
-
-  function pickChallengeChoice(index: number) {
-    if (pickedChoice !== null || !challenge) return;
-    setPickedChoice(index);
-    if (index === challenge.correctIndex) {
-      setChallengeWins((wins) => wins + 1);
-      onAwardXp?.(15);
-    }
   }
 
   return (
@@ -133,108 +90,14 @@ export function StepRenderer({
         </div>
       ) : null}
       {AI_ENABLED && feedbackKind === "wrong" ? (
-        <div className="tutor-block">
-          {!challenge && !challengeError ? (
-            <button
-              className="button button-secondary tutor-button"
-              onClick={() => loadChallenge("similar")}
-              disabled={challengeLoading}
-            >
-              {challengeLoading
-                ? "Spinning up a challenge…"
-                : "✦ Tutor Challenge — practice this until it clicks"}
-            </button>
-          ) : null}
-
-          {challengeError ? (
-            <div className="tutor-note tutor-note-error">
-              <span className="tutor-note-label">AI tutor</span>
-              <p>{challengeError}</p>
-            </div>
-          ) : null}
-
-          {challenge ? (
-            <div className="challenge-card">
-              <div className="challenge-head">
-                <span className="tutor-note-label">
-                  ✦ Tutor Challenge
-                  {challengeWins > 0 ? ` · ${challengeWins} nailed` : ""}
-                </span>
-                <span className="challenge-diff">{difficulty}</span>
-              </div>
-              {challenge.insight ? (
-                <p className="challenge-insight">{challenge.insight}</p>
-              ) : null}
-              <p className="challenge-question">{challenge.question}</p>
-              <div className="answer-panel">
-                {challenge.choices.map((choice, index) => {
-                  const isPicked = pickedChoice === index;
-                  const isAnswer = challenge.correctIndex === index;
-                  const revealed = pickedChoice !== null;
-                  const cls = revealed
-                    ? isAnswer
-                      ? "choice-button choice-correct"
-                      : isPicked
-                        ? "choice-button choice-wrong"
-                        : "choice-button"
-                    : "choice-button";
-                  return (
-                    <button
-                      key={`${choice}-${index}`}
-                      className={cls}
-                      onClick={() => pickChallengeChoice(index)}
-                      disabled={revealed}
-                    >
-                      {choice}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {pickedChoice !== null ? (
-                <>
-                  <div
-                    className={`feedback ${
-                      pickedChoice === challenge.correctIndex
-                        ? "feedback-correct"
-                        : "feedback-wrong"
-                    }`}
-                  >
-                    {pickedChoice === challenge.correctIndex
-                      ? `Nailed it! +15 XP. ${challenge.nudge}`
-                      : challenge.explanation}
-                  </div>
-                  <div className="challenge-actions">
-                    {pickedChoice === challenge.correctIndex ? (
-                      <button
-                        className="button"
-                        onClick={() => loadChallenge("harder")}
-                        disabled={challengeLoading}
-                      >
-                        Level up — harder one
-                      </button>
-                    ) : (
-                      <button
-                        className="button"
-                        onClick={() => loadChallenge("easier")}
-                        disabled={challengeLoading}
-                      >
-                        Try an easier one
-                      </button>
-                    )}
-                    <button
-                      className="button button-secondary"
-                      onClick={() => loadChallenge("similar")}
-                      disabled={challengeLoading}
-                    >
-                      Another like this
-                    </button>
-                  </div>
-                </>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+        <TutorChallenge
+          lessonTitle={lessonTitle ?? "Probability"}
+          conceptSummary={conceptSummary}
+          question={`${step.title} — ${step.body}`}
+          correctIdea={step.feedback.correct}
+          userAnswer={lastWrongAnswer}
+          onAwardXp={onAwardXp}
+        />
       ) : null}
     </section>
   );

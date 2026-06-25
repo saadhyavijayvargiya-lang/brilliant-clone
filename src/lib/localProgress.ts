@@ -30,6 +30,7 @@ export function defaultProgress(): AppProgress {
     currentCorrectStreak: 0,
     longestCorrectStreak: 0,
     experiencePoints: 0,
+    missedSteps: {},
     lessonProgress: {},
     completedLessons: [],
   };
@@ -195,10 +196,19 @@ export function markStepComplete(
   return nextProgress;
 }
 
-export function markIncorrect(progress: AppProgress): AppProgress {
+export function markIncorrect(
+  progress: AppProgress,
+  stepId?: string
+): AppProgress {
+  const active = markActivity(progress);
+  const missedSteps = { ...(active.missedSteps ?? {}) };
+  if (stepId) {
+    missedSteps[stepId] = (missedSteps[stepId] ?? 0) + 1;
+  }
   const nextProgress = {
-    ...markActivity(progress),
+    ...active,
     currentCorrectStreak: 0,
+    missedSteps,
   };
   saveProgress(nextProgress);
   return nextProgress;

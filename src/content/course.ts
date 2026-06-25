@@ -2835,6 +2835,10 @@ export function getLesson(lessonId: string): Lesson | undefined {
   return lessons.find((lesson) => lesson.id === lessonId);
 }
 
+export function getStep(stepId: string): LessonStep | undefined {
+  return steps.find((step) => step.id === stepId);
+}
+
 export function getCourse(courseId: string): Course | undefined {
   return courses.find((item) => item.id === courseId);
 }

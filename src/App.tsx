@@ -112,6 +112,7 @@ export default function App() {
               onDisplayNameChange={(name) => updateDisplayName(name, true)}
               onBackgroundChange={updateProfileBackground}
               onAvatarChange={updateAvatar}
+              onAwardXp={awardXp}
             />
           }
         />

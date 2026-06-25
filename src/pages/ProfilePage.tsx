@@ -1,6 +1,13 @@
-import { courses, getLessonsForCourse } from "../content/course";
+import {
+  courses,
+  getLesson,
+  getLessonsForCourse,
+  getStep,
+} from "../content/course";
 import { getAchievements } from "../lib/achievements";
+import { AI_ENABLED } from "../lib/ai";
 import { getLessonProgress } from "../lib/localProgress";
+import { TutorChallenge } from "../components/TutorChallenge";
 import type { AppProgress } from "../types/content";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -9,6 +16,7 @@ interface ProfilePageProps {
   onDisplayNameChange: (displayName: string) => void;
   onBackgroundChange: (background: string) => void;
   onAvatarChange: (avatar: string) => void;
+  onAwardXp: (amount: number) => void;
 }
 
 const avatarOptions = ["🪐", "🌙", "☄", "✦", "∞", "🛰", "⭐", "🌌"];
@@ -41,12 +49,28 @@ export function ProfilePage({
   onDisplayNameChange,
   onBackgroundChange,
   onAvatarChange,
+  onAwardXp,
 }: ProfilePageProps) {
   const [draftName, setDraftName] = useState(progress.displayName);
+  const [activeWeakSpot, setActiveWeakSpot] = useState<string | null>(null);
 
   useEffect(() => {
     setDraftName(progress.displayName);
   }, [progress.displayName]);
+
+  const weakSpots = Object.entries(progress.missedSteps ?? {})
+    .map(([stepId, count]) => {
+      const step = getStep(stepId);
+      if (!step) return null;
+      const lesson = getLesson(step.lessonId);
+      return { stepId, count, step, lesson };
+    })
+    .filter(
+      (entry): entry is NonNullable<typeof entry> & { count: number } =>
+        entry !== null
+    )
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
   const totalLessons = courses.reduce(
     (sum, course) => sum + getLessonsForCourse(course.id).length,
     0
@@ -194,6 +218,60 @@ export function ProfilePage({
           ))}
         </div>
       </section>
+
+      {weakSpots.length > 0 ? (
+        <section className="panel">
+          <div className="subject-heading">
+            <h2>Weak spots</h2>
+            <span>questions you've missed most</span>
+          </div>
+          <p>
+            Turn your misses into mastery. Launch an AI Tutor Challenge that
+            generates fresh, tailored practice for each tricky concept.
+          </p>
+          <div className="weakspot-list">
+            {weakSpots.map(({ stepId, count, step, lesson }) => (
+              <div className="weakspot-item" key={stepId}>
+                <div className="weakspot-head">
+                  <div>
+                    <strong>{step.title}</strong>
+                    <span>
+                      {lesson ? `${lesson.title} · ` : ""}missed {count}
+                      {count === 1 ? " time" : " times"}
+                    </span>
+                  </div>
+                  <button
+                    className="button button-small"
+                    onClick={() =>
+                      setActiveWeakSpot(
+                        activeWeakSpot === stepId ? null : stepId
+                      )
+                    }
+                  >
+                    {activeWeakSpot === stepId ? "Hide" : "Practice"}
+                  </button>
+                </div>
+                {activeWeakSpot === stepId && AI_ENABLED ? (
+                  <TutorChallenge
+                    lessonTitle={lesson?.title ?? "Probability"}
+                    conceptSummary={lesson?.explanation?.[0]}
+                    question={`${step.title} — ${step.body}`}
+                    correctIdea={step.feedback.correct}
+                    onAwardXp={onAwardXp}
+                    triggerLabel="✦ Generate a practice challenge"
+                  />
+                ) : null}
+                {activeWeakSpot === stepId && !AI_ENABLED ? (
+                  <p className="weakspot-note">
+                    AI challenges are turned off. Set VITE_ENABLE_AI=true to
+                    practice these with the tutor.
+                  </p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="panel">
         <div className="subject-heading">

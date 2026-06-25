@@ -35,8 +35,8 @@ export function useLocalProgress() {
     setProgressState((current) => setCurrentStep(current, lessonId, stepIndex));
   }, []);
 
-  const recordIncorrect = useCallback(() => {
-    setProgressState((current) => markIncorrect(current));
+  const recordIncorrect = useCallback((stepId?: string) => {
+    setProgressState((current) => markIncorrect(current, stepId));
   }, []);
 
   const replaceProgress = useCallback((nextProgress: AppProgress) => {
