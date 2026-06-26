@@ -5,7 +5,19 @@ import {
   Schema,
 } from "firebase/ai";
 import type { GenerativeModel } from "firebase/ai";
-import { app } from "./firebase";
+import { httpsCallable } from "firebase/functions";
+import { app, functions } from "./firebase";
+
+// Provider for the AI tutor:
+//   "firebase" — Firebase AI Logic (Gemini), called directly from the client.
+//   "openai"   — OpenAI via the secure tutorChallenge Cloud Function (needs Blaze).
+//   "worker"   — OpenAI via a free Cloudflare Worker proxy (VITE_AI_PROXY_URL).
+const AI_PROVIDER = (import.meta.env.VITE_AI_PROVIDER ?? "firebase") as
+  | "openai"
+  | "firebase"
+  | "worker";
+
+const AI_PROXY_URL = import.meta.env.VITE_AI_PROXY_URL as string | undefined;
 
 export type ChallengeDifficulty = "easier" | "similar" | "harder";
 
@@ -60,10 +72,95 @@ function getChallengeModel(): GenerativeModel {
 
 /**
  * Generate a fresh, adaptive multiple-choice challenge targeted at the exact
- * misconception behind a learner's wrong answer. Throws TutorUnavailableError
- * when the AI backend is not provisioned.
+ * misconception behind a learner's wrong answer. Dispatches to OpenAI (via a
+ * secure Cloud Function) or Firebase AI Logic depending on VITE_AI_PROVIDER.
+ * Throws TutorUnavailableError when the chosen backend is not ready.
  */
 export async function generateChallenge(
+  req: ChallengeRequest
+): Promise<Challenge> {
+  if (AI_PROVIDER === "worker") {
+    return generateViaWorker(req);
+  }
+  if (AI_PROVIDER === "openai") {
+    return generateViaFunction(req);
+  }
+  return generateViaFirebaseAI(req);
+}
+
+async function generateViaWorker(req: ChallengeRequest): Promise<Challenge> {
+  if (!AI_PROXY_URL) {
+    throw new TutorUnavailableError(
+      "AI proxy URL is not configured (set VITE_AI_PROXY_URL)."
+    );
+  }
+  let response: Response;
+  try {
+    response = await fetch(AI_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req),
+    });
+  } catch {
+    throw new TutorUnavailableError("Could not reach the AI tutor.");
+  }
+  if (!response.ok) {
+    let detail = `Tutor proxy error ${response.status}`;
+    try {
+      const body = (await response.json()) as { error?: string };
+      if (body.error) detail = body.error;
+    } catch {
+      /* ignore */
+    }
+    throw new TutorUnavailableError(detail);
+  }
+  try {
+    const data = (await response.json()) as Partial<Challenge>;
+    return normalizeChallenge(data);
+  } catch {
+    throw new TutorUnavailableError("AI tutor returned invalid data.");
+  }
+}
+
+function normalizeChallenge(data: Partial<Challenge> | undefined): Challenge {
+  if (
+    !data ||
+    typeof data.question !== "string" ||
+    !Array.isArray(data.choices) ||
+    data.choices.length < 2 ||
+    typeof data.correctIndex !== "number" ||
+    data.correctIndex < 0 ||
+    data.correctIndex >= data.choices.length
+  ) {
+    throw new Error("Malformed challenge");
+  }
+  const choices = data.choices.slice(0, 4);
+  return {
+    insight: data.insight ?? "",
+    question: data.question,
+    choices,
+    correctIndex: Math.min(data.correctIndex, choices.length - 1),
+    explanation: data.explanation ?? "",
+    nudge: data.nudge ?? "",
+  };
+}
+
+async function generateViaFunction(req: ChallengeRequest): Promise<Challenge> {
+  try {
+    const callable = httpsCallable<ChallengeRequest, Challenge>(
+      functions,
+      "tutorChallenge"
+    );
+    const result = await callable(req);
+    return normalizeChallenge(result.data);
+  } catch (error) {
+    throw new TutorUnavailableError(
+      error instanceof Error ? error.message : "AI tutor unavailable"
+    );
+  }
+}
+
+async function generateViaFirebaseAI(
   req: ChallengeRequest
 ): Promise<Challenge> {
   let model: GenerativeModel;
@@ -79,28 +176,7 @@ export async function generateChallenge(
 
   try {
     const result = await model.generateContent(prompt);
-    const data = JSON.parse(result.response.text()) as Challenge;
-
-    if (
-      !data ||
-      typeof data.question !== "string" ||
-      !Array.isArray(data.choices) ||
-      data.choices.length < 2 ||
-      typeof data.correctIndex !== "number" ||
-      data.correctIndex < 0 ||
-      data.correctIndex >= data.choices.length
-    ) {
-      throw new Error("Malformed challenge");
-    }
-
-    return {
-      insight: data.insight ?? "",
-      question: data.question,
-      choices: data.choices.slice(0, 4),
-      correctIndex: Math.min(data.correctIndex, Math.min(data.choices.length, 4) - 1),
-      explanation: data.explanation ?? "",
-      nudge: data.nudge ?? "",
-    };
+    return normalizeChallenge(JSON.parse(result.response.text()) as Challenge);
   } catch (error) {
     throw new TutorUnavailableError(
       error instanceof Error ? error.message : "AI tutor unavailable"
