@@ -27,6 +27,7 @@ export function TutorChallenge({
   const [picked, setPicked] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState<ChallengeDifficulty>("similar");
   const [wins, setWins] = useState(0);
+  const [round, setRound] = useState(0);
 
   async function load(nextDifficulty: ChallengeDifficulty) {
     setLoading(true);
@@ -44,6 +45,7 @@ export function TutorChallenge({
         difficulty: nextDifficulty,
       });
       setChallenge(next);
+      setRound((value) => value + 1);
     } catch {
       setError(
         "The AI tutor isn't switched on yet. Once Firebase AI Logic is enabled for this project, you'll get fresh tailored challenges here."
@@ -89,7 +91,7 @@ export function TutorChallenge({
             </span>
             <span className="challenge-diff">{difficulty}</span>
           </div>
-          {challenge.insight ? (
+          {round === 1 && challenge.insight ? (
             <p className="challenge-insight">{challenge.insight}</p>
           ) : null}
           <p className="challenge-question">{challenge.question}</p>
