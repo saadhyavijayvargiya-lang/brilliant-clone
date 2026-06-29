@@ -84,7 +84,7 @@ export default {
     // rejects the item and retries or falls back, so it fails closed (safe).
     const familyCatalog = [
       "Choose ONE problem family and numeric params (the app computes the answer itself):",
-      '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,60,75,80]}. Expected final position of a biased +1/-1 walk.',
+      '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,50,60,75,80]}. Expected final position of a +1/-1 walk (50 = fair).',
       '- "prob-exact-heads": params {flips:int 2-12, heads:int 0..flips}. P(exactly k heads in n fair flips).',
       '- "prob-at-least-one-head": params {flips:int 2-12}. P(at least one head in n fair flips).',
       '- "count-paths": params {steps:int 2-18, end:int with |end|<=steps and same parity as steps}. Number of +1/-1 sequences ending at a position.',

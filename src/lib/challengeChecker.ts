@@ -153,7 +153,7 @@ const expectedPosition: Family = {
     if (!Number.isInteger(steps) || steps < 2 || steps > 40) {
       throw new Error("steps out of range");
     }
-    const allowed = [20, 25, 40, 60, 75, 80];
+    const allowed = [20, 25, 40, 50, 60, 75, 80];
     if (!allowed.includes(pPercent)) throw new Error("pPercent not clean");
     const value = steps * (2 * (pPercent / 100) - 1);
     // keep answers clean (integer or half)
@@ -357,7 +357,7 @@ export const FAMILY_IDS = Object.keys(FAMILIES);
 /** Catalog the model is shown so it can pick a family + params. */
 export const FAMILY_PROMPT = [
   "Choose ONE problem family and numeric params (the app computes the answer itself):",
-  '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,60,75,80]}. Expected final position of a biased +1/-1 walk.',
+  '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,50,60,75,80]}. Expected final position of a +1/-1 walk (50 = fair).',
   '- "prob-exact-heads": params {flips:int 2-12, heads:int 0..flips}. P(exactly k heads in n fair flips).',
   '- "prob-at-least-one-head": params {flips:int 2-12}. P(at least one head in n fair flips).',
   '- "count-paths": params {steps:int 2-18, end:int with |end|<=steps and same parity as steps}. Number of +1/-1 sequences ending at a position.',
