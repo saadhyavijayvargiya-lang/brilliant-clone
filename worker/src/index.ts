@@ -78,8 +78,21 @@ export default {
           ? "Make it a bit HARDER — a small twist or extra step."
           : "Keep it at a SIMILAR difficulty with a fresh scenario.";
 
+    // The app computes the answer + choices itself (deterministic verifier), so the
+    // model only chooses a problem family and numeric params. This keeps the family
+    // catalog in sync with src/lib/challengeChecker.ts; if it drifts, the client
+    // rejects the item and retries or falls back, so it fails closed (safe).
+    const familyCatalog = [
+      "Choose ONE problem family and numeric params (the app computes the answer itself):",
+      '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,60,75,80]}. Expected final position of a biased +1/-1 walk.',
+      '- "prob-exact-heads": params {flips:int 2-12, heads:int 0..flips}. P(exactly k heads in n fair flips).',
+      '- "prob-at-least-one-head": params {flips:int 2-12}. P(at least one head in n fair flips).',
+      '- "count-paths": params {steps:int 2-18, end:int with |end|<=steps and same parity as steps}. Number of +1/-1 sequences ending at a position.',
+      '- "gamblers-ruin": params {start:int, target:int 4-20, 0<start<target}. Fair gambler\'s ruin reach-target probability.',
+    ].join("\n");
+
     const userPrompt = [
-      "Create ONE brand-new multiple-choice practice question targeting the SPECIFIC misconception behind the learner's wrong answer.",
+      "A learner just missed a question. Design ONE fresh practice item targeting the SPECIFIC misconception behind their wrong answer.",
       `Lesson: ${body.lessonTitle ?? "Probability"}`,
       body.conceptSummary ? `Concept background: ${body.conceptSummary}` : "",
       `Original question: ${body.question}`,
@@ -87,8 +100,11 @@ export default {
       `Correct idea: ${body.correctIdea}`,
       `Difficulty: ${difficultyHint}`,
       "",
-      'Respond ONLY with JSON of shape: {"insight": string, "question": string, "choices": string[4], "correctIndex": number, "explanation": string, "nudge": string}.',
-      "Exactly 4 choices, exactly one correct, clean mental-math numbers, concise plain text.",
+      familyCatalog,
+      "",
+      "Pick the family + params whose typical misconception best matches their error.",
+      'Respond ONLY with JSON: {"family": string, "params": object of numbers, "insight": string, "explanation": string, "nudge": string}.',
+      "Do NOT include the answer or any choices — the app computes them. 'insight' names the misconception in one friendly sentence; 'explanation' and 'nudge' are short and plain.",
     ]
       .filter(Boolean)
       .join("\n");
@@ -103,13 +119,13 @@ export default {
         },
         body: JSON.stringify({
           model: env.OPENAI_MODEL ?? "gpt-4o-mini",
-          temperature: 0.85,
+          temperature: 0.7,
           response_format: { type: "json_object" },
           messages: [
             {
               role: "system",
               content:
-                "You are a sharp, upbeat probability tutor. Respond only with valid JSON.",
+                "You are a sharp, upbeat probability tutor. You pick a problem family and numeric params; the app computes the answer. Respond only with valid JSON.",
             },
             { role: "user", content: userPrompt },
           ],
@@ -134,10 +150,9 @@ export default {
     const content = payload.choices?.[0]?.message?.content ?? "{}";
 
     let parsed: {
+      family?: string;
+      params?: Record<string, number>;
       insight?: string;
-      question?: string;
-      choices?: string[];
-      correctIndex?: number;
       explanation?: string;
       nudge?: string;
     };
@@ -147,25 +162,16 @@ export default {
       return json({ error: "Model returned invalid JSON" }, 502, cors);
     }
 
-    if (
-      !parsed.question ||
-      !Array.isArray(parsed.choices) ||
-      parsed.choices.length < 2 ||
-      typeof parsed.correctIndex !== "number"
-    ) {
+    if (!parsed.family || typeof parsed.family !== "string" || !parsed.params) {
       return json({ error: "Model returned a malformed challenge" }, 502, cors);
     }
 
-    const choices = parsed.choices.slice(0, 4);
+    // Pass the family + params through; the app verifies and computes the answer.
     return json(
       {
+        family: parsed.family,
+        params: parsed.params,
         insight: parsed.insight ?? "",
-        question: parsed.question,
-        choices,
-        correctIndex: Math.max(
-          0,
-          Math.min(parsed.correctIndex, choices.length - 1)
-        ),
         explanation: parsed.explanation ?? "",
         nudge: parsed.nudge ?? "",
       },

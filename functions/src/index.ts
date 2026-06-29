@@ -51,8 +51,21 @@ export const tutorChallenge = onCall(
           ? "Make it a bit HARDER — a small twist or extra step."
           : "Keep it at a SIMILAR difficulty with a fresh scenario.";
 
+    // The app computes the answer + choices itself (deterministic verifier), so
+    // the model only picks a problem family and numeric params. Keep this catalog
+    // in sync with src/lib/challengeChecker.ts; drift fails closed (client retries
+    // or falls back).
+    const familyCatalog = [
+      "Choose ONE problem family and numeric params (the app computes the answer itself):",
+      '- "expected-position": params {steps:int 2-40, pPercent in [20,25,40,60,75,80]}. Expected final position of a biased +1/-1 walk.',
+      '- "prob-exact-heads": params {flips:int 2-12, heads:int 0..flips}. P(exactly k heads in n fair flips).',
+      '- "prob-at-least-one-head": params {flips:int 2-12}. P(at least one head in n fair flips).',
+      '- "count-paths": params {steps:int 2-18, end:int with |end|<=steps and same parity as steps}. Number of +1/-1 sequences ending at a position.',
+      '- "gamblers-ruin": params {start:int, target:int 4-20, 0<start<target}. Fair gambler\'s ruin reach-target probability.',
+    ].join("\n");
+
     const userPrompt = [
-      "Create ONE brand-new multiple-choice practice question targeting the SPECIFIC misconception behind the learner's wrong answer.",
+      "A learner just missed a question. Design ONE fresh practice item targeting the SPECIFIC misconception behind their wrong answer.",
       `Lesson: ${data.lessonTitle ?? "Probability"}`,
       data.conceptSummary ? `Concept background: ${data.conceptSummary}` : "",
       `Original question: ${data.question}`,
@@ -60,8 +73,11 @@ export const tutorChallenge = onCall(
       `Correct idea: ${data.correctIdea}`,
       `Difficulty: ${difficultyHint}`,
       "",
-      'Respond ONLY with JSON of shape: {"insight": string, "question": string, "choices": string[4], "correctIndex": number, "explanation": string, "nudge": string}.',
-      "Exactly 4 choices, exactly one correct, clean mental-math numbers, concise plain text.",
+      familyCatalog,
+      "",
+      "Pick the family + params whose typical misconception best matches their error.",
+      'Respond ONLY with JSON: {"family": string, "params": object of numbers, "insight": string, "explanation": string, "nudge": string}.',
+      "Do NOT include the answer or any choices — the app computes them. 'insight' names the misconception in one friendly sentence; 'explanation' and 'nudge' are short and plain.",
     ]
       .filter(Boolean)
       .join("\n");
@@ -106,10 +122,9 @@ export const tutorChallenge = onCall(
     const content = payload.choices?.[0]?.message?.content ?? "{}";
 
     let parsed: {
+      family?: string;
+      params?: Record<string, number>;
       insight?: string;
-      question?: string;
-      choices?: string[];
-      correctIndex?: number;
       explanation?: string;
       nudge?: string;
     };
@@ -119,21 +134,15 @@ export const tutorChallenge = onCall(
       throw new HttpsError("internal", "Model returned invalid JSON.");
     }
 
-    if (
-      !parsed.question ||
-      !Array.isArray(parsed.choices) ||
-      parsed.choices.length < 2 ||
-      typeof parsed.correctIndex !== "number"
-    ) {
+    if (!parsed.family || typeof parsed.family !== "string" || !parsed.params) {
       throw new HttpsError("internal", "Model returned a malformed challenge.");
     }
 
-    const choices = parsed.choices.slice(0, 4);
+    // Pass family + params through; the client verifies and computes the answer.
     return {
+      family: parsed.family,
+      params: parsed.params,
       insight: parsed.insight ?? "",
-      question: parsed.question,
-      choices,
-      correctIndex: Math.max(0, Math.min(parsed.correctIndex, choices.length - 1)),
       explanation: parsed.explanation ?? "",
       nudge: parsed.nudge ?? "",
     };

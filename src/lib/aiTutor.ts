@@ -1,12 +1,13 @@
-import {
-  getAI,
-  getGenerativeModel,
-  GoogleAIBackend,
-  Schema,
-} from "firebase/ai";
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 import type { GenerativeModel } from "firebase/ai";
 import { httpsCallable } from "firebase/functions";
 import { app, functions } from "./firebase";
+import {
+  assembleVerifiedChallenge,
+  buildFallbackChallenge,
+  FAMILY_PROMPT,
+} from "./challengeChecker";
+import type { RawChallenge } from "./challengeChecker";
 
 // Provider for the AI tutor:
 //   "firebase" — Firebase AI Logic (Gemini), called directly from the client.
@@ -18,6 +19,10 @@ const AI_PROVIDER = (import.meta.env.VITE_AI_PROVIDER ?? "firebase") as
   | "worker";
 
 const AI_PROXY_URL = import.meta.env.VITE_AI_PROXY_URL as string | undefined;
+
+// How many times to ask the model for a verifiable item before falling back to
+// a fully code-generated (deterministic) question.
+const MAX_ATTEMPTS = 3;
 
 export type ChallengeDifficulty = "easier" | "similar" | "harder";
 
@@ -41,54 +46,42 @@ export interface Challenge {
 
 export class TutorUnavailableError extends Error {}
 
-let challengeModel: GenerativeModel | null = null;
-
-function getChallengeModel(): GenerativeModel {
-  if (challengeModel) return challengeModel;
-
-  const ai = getAI(app, { backend: new GoogleAIBackend() });
-  const schema = Schema.object({
-    properties: {
-      insight: Schema.string(),
-      question: Schema.string(),
-      choices: Schema.array({ items: Schema.string() }),
-      correctIndex: Schema.number(),
-      explanation: Schema.string(),
-      nudge: Schema.string(),
-    },
-  });
-
-  challengeModel = getGenerativeModel(ai, {
-    model: "gemini-flash-latest",
-    generationConfig: {
-      temperature: 0.85,
-      maxOutputTokens: 700,
-      responseMimeType: "application/json",
-      responseSchema: schema,
-    },
-  });
-  return challengeModel;
-}
-
 /**
  * Generate a fresh, adaptive multiple-choice challenge targeted at the exact
- * misconception behind a learner's wrong answer. Dispatches to OpenAI (via a
- * secure Cloud Function) or Firebase AI Logic depending on VITE_AI_PROVIDER.
- * Throws TutorUnavailableError when the chosen backend is not ready.
+ * misconception behind a learner's wrong answer.
+ *
+ * The model only chooses a problem family + numeric params; the deterministic
+ * checker (challengeChecker) computes the correct answer and builds the choices,
+ * so a wrong answer key is impossible. If the model returns an unknown family or
+ * out-of-range params, we retry; after MAX_ATTEMPTS we fall back to a fully
+ * code-generated question so the learner always sees a valid item.
+ *
+ * Throws TutorUnavailableError only when the backend itself is unreachable or
+ * not configured (so the UI can show a friendly "not enabled" message).
  */
 export async function generateChallenge(
   req: ChallengeRequest
 ): Promise<Challenge> {
-  if (AI_PROVIDER === "worker") {
-    return generateViaWorker(req);
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+    // Provider errors (network/config) propagate; verification errors are retried.
+    const raw = await callProvider(req);
+    try {
+      return assembleVerifiedChallenge(raw);
+    } catch {
+      // Model proposed an unverifiable item — try again.
+    }
   }
-  if (AI_PROVIDER === "openai") {
-    return generateViaFunction(req);
-  }
+  // Backend works but couldn't produce a verifiable item: deterministic fallback.
+  return buildFallbackChallenge(req.difficulty);
+}
+
+async function callProvider(req: ChallengeRequest): Promise<RawChallenge> {
+  if (AI_PROVIDER === "worker") return generateViaWorker(req);
+  if (AI_PROVIDER === "openai") return generateViaFunction(req);
   return generateViaFirebaseAI(req);
 }
 
-async function generateViaWorker(req: ChallengeRequest): Promise<Challenge> {
+async function generateViaWorker(req: ChallengeRequest): Promise<RawChallenge> {
   if (!AI_PROXY_URL) {
     throw new TutorUnavailableError(
       "AI proxy URL is not configured (set VITE_AI_PROXY_URL)."
@@ -115,44 +108,22 @@ async function generateViaWorker(req: ChallengeRequest): Promise<Challenge> {
     throw new TutorUnavailableError(detail);
   }
   try {
-    const data = (await response.json()) as Partial<Challenge>;
-    return normalizeChallenge(data);
+    return (await response.json()) as RawChallenge;
   } catch {
     throw new TutorUnavailableError("AI tutor returned invalid data.");
   }
 }
 
-function normalizeChallenge(data: Partial<Challenge> | undefined): Challenge {
-  if (
-    !data ||
-    typeof data.question !== "string" ||
-    !Array.isArray(data.choices) ||
-    data.choices.length < 2 ||
-    typeof data.correctIndex !== "number" ||
-    data.correctIndex < 0 ||
-    data.correctIndex >= data.choices.length
-  ) {
-    throw new Error("Malformed challenge");
-  }
-  const choices = data.choices.slice(0, 4);
-  return {
-    insight: data.insight ?? "",
-    question: data.question,
-    choices,
-    correctIndex: Math.min(data.correctIndex, choices.length - 1),
-    explanation: data.explanation ?? "",
-    nudge: data.nudge ?? "",
-  };
-}
-
-async function generateViaFunction(req: ChallengeRequest): Promise<Challenge> {
+async function generateViaFunction(
+  req: ChallengeRequest
+): Promise<RawChallenge> {
   try {
-    const callable = httpsCallable<ChallengeRequest, Challenge>(
+    const callable = httpsCallable<ChallengeRequest, RawChallenge>(
       functions,
       "tutorChallenge"
     );
     const result = await callable(req);
-    return normalizeChallenge(result.data);
+    return result.data;
   } catch (error) {
     throw new TutorUnavailableError(
       error instanceof Error ? error.message : "AI tutor unavailable"
@@ -160,9 +131,25 @@ async function generateViaFunction(req: ChallengeRequest): Promise<Challenge> {
   }
 }
 
+let challengeModel: GenerativeModel | null = null;
+
+function getChallengeModel(): GenerativeModel {
+  if (challengeModel) return challengeModel;
+  const ai = getAI(app, { backend: new GoogleAIBackend() });
+  challengeModel = getGenerativeModel(ai, {
+    model: "gemini-flash-latest",
+    generationConfig: {
+      temperature: 0.85,
+      maxOutputTokens: 500,
+      responseMimeType: "application/json",
+    },
+  });
+  return challengeModel;
+}
+
 async function generateViaFirebaseAI(
   req: ChallengeRequest
-): Promise<Challenge> {
+): Promise<RawChallenge> {
   let model: GenerativeModel;
   try {
     model = getChallengeModel();
@@ -171,12 +158,9 @@ async function generateViaFirebaseAI(
       error instanceof Error ? error.message : "AI tutor unavailable"
     );
   }
-
-  const prompt = buildPrompt(req);
-
   try {
-    const result = await model.generateContent(prompt);
-    return normalizeChallenge(JSON.parse(result.response.text()) as Challenge);
+    const result = await model.generateContent(buildPrompt(req));
+    return JSON.parse(result.response.text()) as RawChallenge;
   } catch (error) {
     throw new TutorUnavailableError(
       error instanceof Error ? error.message : "AI tutor unavailable"
@@ -184,16 +168,18 @@ async function generateViaFirebaseAI(
   }
 }
 
-function buildPrompt(req: ChallengeRequest): string {
+export function buildPrompt(req: ChallengeRequest): string {
   const difficultyHint = {
-    easier: "Make it noticeably EASIER and more scaffolded than the original — smaller numbers, more obvious structure.",
-    similar: "Keep it at a SIMILAR difficulty to the original, but with a fresh scenario and new numbers.",
-    harder: "Make it a bit HARDER — a small twist or an extra step beyond the original.",
+    easier:
+      "Make it noticeably EASIER and more scaffolded — smaller numbers, more obvious structure.",
+    similar:
+      "Keep it at a SIMILAR difficulty to the original, with fresh numbers.",
+    harder: "Make it a bit HARDER — a small twist or an extra step.",
   }[req.difficulty];
 
   return [
     "You are a sharp, upbeat probability coach inside a learn-by-doing app.",
-    "A learner just missed a question. Create ONE brand-new multiple-choice practice question that targets the SPECIFIC misconception behind their wrong answer, so they can prove they've got it now.",
+    "A learner just missed a question. Design ONE fresh practice item that targets the SPECIFIC misconception behind their wrong answer.",
     "",
     `Lesson: ${req.lessonTitle}`,
     req.conceptSummary ? `Concept background: ${req.conceptSummary}` : "",
@@ -202,13 +188,12 @@ function buildPrompt(req: ChallengeRequest): string {
     `The correct idea behind the original: ${req.correctIdea}`,
     `Difficulty: ${difficultyHint}`,
     "",
-    "Rules:",
-    "- Provide exactly 4 answer choices, with exactly one correct.",
-    "- Use clean, simple numbers a learner can compute mentally.",
-    "- 'insight': one short, friendly sentence naming the misconception their answer suggests.",
-    "- 'explanation': 1-2 sentences on why the correct choice is right.",
-    "- 'nudge': a short, motivating one-liner.",
-    "- Keep everything concise and plain (no markdown).",
+    FAMILY_PROMPT,
+    "",
+    "Pick the family + params whose typical misconception best matches their error.",
+    'Respond ONLY with JSON: {"family": string, "params": object of numbers, "insight": string, "explanation": string, "nudge": string}.',
+    "Do NOT include the answer or the choices — the app computes them deterministically.",
+    "'insight' names the misconception in one friendly sentence; 'explanation' and 'nudge' are short and plain (no markdown).",
   ]
     .filter(Boolean)
     .join("\n");
